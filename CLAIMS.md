@@ -20,5 +20,5 @@ Every README claim, mapped to a command or tx hash that reproduces it. Status wo
 | The app works under a sub-path | LIVE | build, serve `dist` under `/tab/`, run `BASE=http://127.0.0.1:<port>/tab node packages/tab-web/scripts/e2e/harden.mjs`; DECISIONS.md D11 |
 | Landing page ships without viem (entry 119 kB gzip) | LIVE | `npm run build:web`, read the chunk sizes |
 | Landing page Lighthouse 100/100/100/100, LCP 390 ms, CLS 0.01 (local, unthrottled) | LIVE | build, `npx vite preview`, run Lighthouse and a performance trace in Chrome DevTools on http://localhost:4173/; DECISIONS.md D11 |
-| Hosted app at https://juicewrld998.github.io/tab/ | NOT LIVE | needs Pages switched on (Settings, Pages, Source: GitHub Actions); then `curl -I` the URL |
+| Hosted app at https://juicewrld998.github.io/tab/ | NOT LIVE | blocked: GitHub Actions on the owner account fails with a billing lock (DECISIONS.md D11); deploy `packages/tab-web/dist` to any static host, then `curl -I` the URL |
 | npm packages `@tab/core`, `@tab/chain` | NOT LIVE | not published; DECISIONS.md D11 |
