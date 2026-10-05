@@ -27,6 +27,8 @@ export interface Ledger {
   name: string;
   members: Address[];
   creator: Address;
+  /** Where the accepted creation memo sits. A share link carries this block so a reader scans one range instead of walking back. */
+  created: { blockNumber: bigint; txHash: Hex };
   expenses: Expense[];
   settled: SettledLeg[];
   /** Net balance after expenses AND settled legs. Zero for everyone when the group is square. */
@@ -48,6 +50,7 @@ export function buildLedger(groupId: string, entries: LedgerEntry[]): Ledger | n
   const sorted = [...entries].sort((a, b) => (a.blockNumber === b.blockNumber ? a.logIndex - b.logIndex : a.blockNumber < b.blockNumber ? -1 : 1));
   let name = "";
   let creator: Address | null = null;
+  let created: Ledger["created"] | null = null;
   let members = new Set<Address>();
   const expenses: Expense[] = [];
   const settled: SettledLeg[] = [];
@@ -66,7 +69,7 @@ export function buildLedger(groupId: string, entries: LedgerEntry[]): Ledger | n
       if (creator) { rejected.push({ entry: e, reason: "group already created" }); continue; }
       const list = m.members.map(normalize);
       if (list.length < 2 || !list.includes(sender)) { rejected.push({ entry: e, reason: "creator must be a member of a 2+ member group" }); continue; }
-      creator = sender; name = m.name; members = new Set(list);
+      creator = sender; name = m.name; members = new Set(list); created = { blockNumber: e.blockNumber, txHash: e.txHash };
       continue;
     }
     if (!creator) { rejected.push({ entry: e, reason: "group not created yet" }); continue; }
@@ -83,7 +86,7 @@ export function buildLedger(groupId: string, entries: LedgerEntry[]): Ledger | n
       settled.push({ from: m.from, to: m.to, amount: m.amount, txHash: e.txHash });
     }
   }
-  if (!creator) return null;
+  if (!creator || !created) return null;
 
   const balances = foldBalances(expenses);
   for (const s of settled) {
@@ -91,5 +94,5 @@ export function buildLedger(groupId: string, entries: LedgerEntry[]): Ledger | n
     balances.set(s.to, (balances.get(s.to) ?? 0n) - s.amount);
   }
   for (const [k, v] of balances) if (v === 0n) balances.delete(k);
-  return { groupId, name, members: [...members].sort(), creator, expenses, settled, balances, rejected };
+  return { groupId, name, members: [...members].sort(), creator, created, expenses, settled, balances, rejected };
 }
