@@ -93,13 +93,22 @@ export interface VerifyTxOptions {
   onProgress?: (msg: string) => void;
 }
 
+/** The tx is real but none of its Memo events is a Tab memo (a foreign app, or a plain Memo call). Raised before any log scan. */
+export class NotTabTxError extends Error {
+  override name = "NotTabTxError";
+  constructor(hash: string, memoCount: number) {
+    super(memoCount === 0 ? `Transaction ${hash} has no Memo events, so it is not a Tab transaction.` : `Transaction ${hash} has ${memoCount} Memo event(s), but none carries Tab data. It is not a Tab transaction.`);
+  }
+}
+
 export async function verifyTx(client: PublicClient, hash: Hex, opts: VerifyTxOptions = {}): Promise<TxVerification> {
   opts.onProgress?.("reading receipt");
   const receipt = await withRetry(() => client.getTransactionReceipt({ hash }));
   if (receipt.status !== "success") throw new Error(`tx ${hash} did not succeed (status ${receipt.status})`);
   const facts = analyzeLogs(receipt.logs.map((l) => ({ address: l.address, topics: l.topics as Hex[], data: l.data, logIndex: l.logIndex })));
-  if (facts.memos.length === 0) throw new Error("this tx has no Memo events");
-  const memoIds = [...new Set(facts.memos.map((m) => m.memoId))];
+  const tabMemos = facts.memos.filter((m) => m.memo !== null);
+  if (tabMemos.length === 0) throw new NotTabTxError(hash, facts.memos.length);
+  const memoIds = [...new Set(tabMemos.map((m) => m.memoId))];
   const legs = checkLegs(facts);
 
   // A Tab batch is one group. If a tx mixes memoIds, verify the first and say so through memoIds.length.

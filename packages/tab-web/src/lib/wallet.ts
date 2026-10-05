@@ -47,7 +47,7 @@ async function ensureArc(eth: Eip1193) {
   try {
     await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: CHAIN_HEX }] });
   } catch (e) {
-    if ((e as { code?: number }).code !== 4902) throw e;
+    if ((e as { code?: number }).code !== 4902) throw new Error("Your wallet is not on Arc mainnet and did not switch. Switch to Arc (chain id 5042) in the wallet, then connect again.");
     await eth.request({
       method: "wallet_addEthereumChain",
       params: [

@@ -5,4 +5,3 @@ export * from "./guards";
 export * from "./write";
 export * from "./settle";
 export * from "./verify";
-export * from "./verify";

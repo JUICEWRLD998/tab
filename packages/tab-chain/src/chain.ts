@@ -16,7 +16,7 @@ export const txUrl = (hash: string) => `${arcMainnet.blockExplorers.default.url}
 export const addressUrl = (a: string) => `${arcMainnet.blockExplorers.default.url}/address/${a}`;
 
 export function makePublicClient(rpcUrls: string[] = arcMainnet.rpcUrls.default.http as unknown as string[]): PublicClient {
-  const transports = rpcUrls.map((u) => http(u, { retryCount: 4, retryDelay: 400, timeout: 20_000 }));
+  const transports = rpcUrls.map((u) => http(u, { retryCount: 2, retryDelay: 400, timeout: 15_000 }));
   return createPublicClient({
     chain: arcMainnet,
     transport: transports.length > 1 ? fallback(transports) : transports[0]!,

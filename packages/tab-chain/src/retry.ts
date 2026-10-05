@@ -17,7 +17,7 @@ function errorCode(e: unknown): number | undefined {
 export const isRetryable = (e: unknown) => errorCode(e) === RPC_LAGGING || errorCode(e) === RPC_RATE_LIMITED || /rate limit/i.test(String((e as any)?.message ?? e)) || /timeout|fetch failed|HTTP request failed/i.test(String((e as any)?.message ?? e));
 
 export async function withRetry<T>(fn: () => Promise<T>, opts: { tries?: number; baseMs?: number; sleep?: (ms: number) => Promise<void> } = {}): Promise<T> {
-  const { tries = 6, baseMs = 300, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = opts;
+  const { tries = 5, baseMs = 300, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) } = opts;
   let last: unknown;
   for (let i = 0; i < tries; i++) {
     try {
