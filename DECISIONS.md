@@ -38,3 +38,11 @@ Deploy wallet (throwaway, key held off-repo): `0xe874C32569a28B2D0bCa07Ef25F0ec0
 
 ### D6. Memo logs are public, so the ledger enforces trust rules
 Anyone can post a Memo under any `memoId`. `buildLedger` counts a memo only if: the first group memo defines members (creator must be a member); the sender is a member; an expense has `payer == sender` and member participants; a settle leg has `from == sender`, target USDC, and `callDataHash == keccak(USDC.transfer(to, amount))`. Each rule has a planted attacker test in `packages/tab-core/test/ledger.test.ts`.
+
+### D7. Phase 3 exit: mainnet settle, 3 legs, per-leg memo (2026-10-05)
+- Group `settle-1791182997797`: four members, three of them each paid 0.30 split four ways; the fourth (the deploy wallet) owes three creditors 0.075 each.
+- Settle tx: `0x42a23d78ca8e4ee7a16975b27d5c18ab303edb67359412aadc5f5b184936eec8` (block 24350357, status 1, 140,903 gas ≈ 0.0028 USDC).
+- Checked from a raw receipt (`cast receipt`, not our code): 3 `Memo` logs under one memoId, 3 USDC transfers of 75000 base units, and every `Transfer.from` is the one signer.
+- Re-reading the group with the ledger builder shows 3 settled legs, 0 rejected memos, and every balance at zero.
+- A second identical run exists: group `settle-1791183025943`, tx `0x048927dee734bb6386a16c0bc0c2db185ed6f841e32e3f386aff465d72723ccf`.
+- The wallet is square after each run only because the creditors are my own throwaway wallets. Real value moved between wallets I hold; nothing left them.
