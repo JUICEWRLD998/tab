@@ -1,0 +1,50 @@
+.skeleton {
+  display: grid;
+  gap: var(--s5);
+}
+.skHead {
+  height: 2.4rem;
+  width: min(22rem, 70%);
+  background: var(--raised);
+  border-radius: var(--radius-sm);
+}
+.skBody {
+  display: grid;
+  gap: var(--s4);
+}
+@media (min-width: 1024px) {
+  .skBody {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+  }
+}
+.skBlock {
+  min-height: 14rem;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.progress {
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+
+.empty {
+  max-width: 560px;
+  display: grid;
+  gap: var(--s4);
+}
+.empty h1 {
+  font-size: var(--step-2);
+}
+.empty p {
+  color: var(--muted);
+}
+.retry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  align-items: end;
+}
+.fromField {
+  width: 12rem;
+}

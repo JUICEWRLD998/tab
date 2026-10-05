@@ -29,6 +29,7 @@ describe("buildLedger", () => {
     expect(l.balances.get(C)).toBe(-130n);
     expect(netTransfers(l.balances).length).toBe(2);
     expect(l.rejected).toHaveLength(0);
+    expect(l.created.blockNumber).toBe(1000n);
   });
   it("returns null when the group was never created", () => {
     expect(buildLedger("g", chain(spend(A, 5n)))).toBeNull();

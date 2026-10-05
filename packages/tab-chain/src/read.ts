@@ -57,3 +57,38 @@ export function fetchMemoEntries(client: PublicClient, groupId: string, opts: Re
 export async function readLedger(client: PublicClient, groupId: string, opts: ReadOptions): Promise<Ledger | null> {
   return buildLedger(groupId, await fetchMemoEntries(client, groupId, opts));
 }
+
+/** First look 40k blocks back (about 6 hours at the measured ~0.5 s block time); if the creation memo is not there, walk back in steps up to the cap. */
+export const LOOKBACK_STEP = 40_000n;
+export const DEFAULT_LOOKBACK = 400_000n;
+
+export interface FoundLedger {
+  ledger: Ledger | null;
+  entries: LedgerEntry[];
+  /** The lowest block that was scanned. */
+  scannedFrom: bigint;
+}
+
+/**
+ * Rebuild a group when its creation block is not known. Scan [anchor - step, head], then walk further back one step at a time
+ * until the group's creation memo shows up or the cap is reached. A known fromBlock skips the walk.
+ */
+export async function findLedger(
+  client: PublicClient,
+  memoId: Hex,
+  opts: { anchor: bigint; fromBlock?: bigint; lookback?: bigint; minHead?: bigint; onProgress?: (msg: string) => void },
+): Promise<FoundLedger> {
+  const cap = opts.lookback ?? DEFAULT_LOOKBACK;
+  const floor = (n: bigint) => (n > 0n ? n : 0n);
+  let scannedFrom = opts.fromBlock ?? floor(opts.anchor - LOOKBACK_STEP);
+  let entries = await fetchMemoEntriesById(client, memoId, { fromBlock: scannedFrom, minHead: opts.minHead });
+  let ledger = buildLedger(memoId, entries);
+  while (!ledger && opts.fromBlock === undefined && scannedFrom > 0n && opts.anchor - scannedFrom < cap) {
+    const from = floor(scannedFrom - LOOKBACK_STEP);
+    opts.onProgress?.(`group not found yet, scanning back to block ${from}`);
+    entries = [...(await fetchMemoEntriesById(client, memoId, { fromBlock: from, toBlock: scannedFrom - 1n })), ...entries];
+    scannedFrom = from;
+    ledger = buildLedger(memoId, entries);
+  }
+  return { ledger, entries, scannedFrom };
+}
