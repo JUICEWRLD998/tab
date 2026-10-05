@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+*.key
+*.keystore
+.wallet/
+coverage/
+.DS_Store
