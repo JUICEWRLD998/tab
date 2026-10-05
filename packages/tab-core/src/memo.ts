@@ -1,4 +1,4 @@
-import { decodeAbiParameters, decodeEventLog, encodeAbiParameters, keccak256, parseAbi, parseAbiParameters, stringToBytes, type Hex } from "viem";
+import { decodeAbiParameters, encodeFunctionData, decodeEventLog, encodeAbiParameters, keccak256, parseAbi, parseAbiParameters, stringToBytes, type Hex } from "viem";
 import { normalize, type Address } from "./expense";
 import type { Amount } from "./money";
 
@@ -13,10 +13,12 @@ export const memoAbi = parseAbi([
   "event BeforeMemo(uint256 index)",
   "event Memo(address indexed sender, address indexed target, bytes32 indexed memoId, bytes32 callDataHash, bytes memoData, uint256 index)",
 ]);
+export const erc20TransferAbi = parseAbi(["function transfer(address to, uint256 amount) returns (bool)"]);
 export const MEMO_TOPIC0 = "0xeb15ee720798341c37739df41be53acfbbf70ae6802dade35457beec6e47a5e4" as const;
 
 export const KIND_EXPENSE = 1;
 export const KIND_SETTLE = 2;
+export const KIND_GROUP = 3;
 
 export function groupMemoId(groupId: string): Hex {
   if (!groupId) throw new Error("groupId is empty");
@@ -24,6 +26,7 @@ export function groupMemoId(groupId: string): Hex {
 }
 
 const expenseParams = parseAbiParameters("uint8 kind, address payer, uint256 amount, address[] participants, string label");
+const groupParams = parseAbiParameters("uint8 kind, string name, address[] members");
 const settleParams = parseAbiParameters("uint8 kind, address from, address to, uint256 amount");
 
 export interface ExpenseMemo {
@@ -39,7 +42,24 @@ export interface SettleMemo {
   to: Address;
   amount: Amount;
 }
-export type TabMemo = ExpenseMemo | SettleMemo;
+export interface GroupMemo {
+  kind: "group";
+  name: string;
+  members: Address[];
+}
+export type TabMemo = ExpenseMemo | SettleMemo | GroupMemo;
+
+export function encodeGroupMemo(m: Omit<GroupMemo, "kind">): Hex {
+  const members = [...new Set(m.members.map(normalize))].sort();
+  if (members.length < 2) throw new Error("a group needs at least 2 members");
+  return encodeAbiParameters(groupParams, [KIND_GROUP, m.name, members]);
+}
+
+/** The target call a settle leg must carry: USDC.transfer(to, amount). Its keccak is the Memo callDataHash. */
+export function settleCallData(to: Address, amount: Amount): Hex {
+  return encodeFunctionData({ abi: erc20TransferAbi, functionName: "transfer", args: [normalize(to), amount] });
+}
+export const settleCallDataHash = (to: Address, amount: Amount): Hex => keccak256(settleCallData(to, amount));
 
 export function encodeExpenseMemo(m: Omit<ExpenseMemo, "kind">): Hex {
   if (m.amount <= 0n) throw new Error("amount must be positive");
@@ -59,6 +79,10 @@ export function decodeTabMemo(memoData: Hex): TabMemo | null {
     if (kind === KIND_EXPENSE) {
       const [, payer, amount, participants, label] = decodeAbiParameters(expenseParams, memoData);
       return { kind: "expense", payer: payer.toLowerCase() as Address, amount, participants: participants.map((p) => p.toLowerCase() as Address), label };
+    }
+    if (kind === KIND_GROUP) {
+      const [, name, members] = decodeAbiParameters(groupParams, memoData);
+      return { kind: "group", name, members: members.map((p) => p.toLowerCase() as Address) };
     }
     if (kind === KIND_SETTLE) {
       const [, from, to, amount] = decodeAbiParameters(settleParams, memoData);
