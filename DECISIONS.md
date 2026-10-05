@@ -30,3 +30,11 @@ Deploy wallet (throwaway, key held off-repo): `0xe874C32569a28B2D0bCa07Ef25F0ec0
 - D2 shows one signature moves value only from the signer. A single signature therefore cannot pay the whole group.
 - Decision: netting produces the group-wide transfer list (N debts become at most N-1 transfers). Each debtor then signs one `aggregate3` batch holding **their own** legs. A debtor who owes several creditors still pays them all in one signature.
 - The demo script is cut around one debtor with 2+ legs. The settle screen shows the whole group plan and marks each leg as paid or open, rebuilt from Memo events.
+
+### D5. Read-after-write lag and log range (measured 2026-10-05)
+- `eth_getLogs` rejects ranges over 10,000 blocks (`-32012 requested range too large`; 9,999 passed). The reader chunks at 5,000.
+- The load-balanced RPC can serve a head **behind a receipt you just got**. A live test read two expenses right after writing them and saw one. Re-reading 30 s later saw both. The reader takes `minHead` and polls until the head reaches the last written block.
+- Live smoke test passed: group `smoke-1791182815935`, create `0x1549b149…fb95`, expenses `0x7443433b…abba` and `0xb2290abc…756c`, rebuilt balances matched.
+
+### D6. Memo logs are public, so the ledger enforces trust rules
+Anyone can post a Memo under any `memoId`. `buildLedger` counts a memo only if: the first group memo defines members (creator must be a member); the sender is a member; an expense has `payer == sender` and member participants; a settle leg has `from == sender`, target USDC, and `callDataHash == keccak(USDC.transfer(to, amount))`. Each rule has a planted attacker test in `packages/tab-core/test/ledger.test.ts`.

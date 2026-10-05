@@ -10,10 +10,24 @@ export interface ReadOptions {
   fromBlock: bigint;
   toBlock?: bigint;
   chunk?: bigint;
+  /** Wait until the RPC head reaches this block before reading. The load-balanced endpoint can serve a head behind a receipt you just got (seen live 2026-10-05), so pass the block of your last write. */
+  minHead?: bigint;
+}
+
+export async function waitForHead(client: PublicClient, minHead: bigint, opts: { timeoutMs?: number; pollMs?: number } = {}): Promise<bigint> {
+  const { timeoutMs = 15_000, pollMs = 250 } = opts;
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const head = await withRetry(() => client.getBlockNumber());
+    if (head >= minHead) return head;
+    if (Date.now() > deadline) throw new Error(`RPC head ${head} did not reach block ${minHead} within ${timeoutMs}ms`);
+    await new Promise((r) => setTimeout(r, pollMs));
+  }
 }
 
 export async function fetchMemoEntries(client: PublicClient, groupId: string, opts: ReadOptions): Promise<LedgerEntry[]> {
   const memoId = groupMemoId(groupId);
+  if (opts.minHead !== undefined) await waitForHead(client, opts.minHead);
   const head = opts.toBlock ?? (await withRetry(() => client.getBlockNumber()));
   const chunk = opts.chunk ?? LOG_CHUNK;
   if (opts.fromBlock > head) return [];
