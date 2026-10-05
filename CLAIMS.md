@@ -19,5 +19,6 @@ Every README claim, mapped to a command or tx hash that reproduces it. Status wo
 | An open group can be read from a terminal | LIVE | `npm run group -- tab-1h4j301v 24357102` |
 | The app works under a sub-path | LIVE | build, serve `dist` under `/tab/`, run `BASE=http://127.0.0.1:<port>/tab node packages/tab-web/scripts/e2e/harden.mjs`; DECISIONS.md D11 |
 | Landing page ships without viem (entry 119 kB gzip) | LIVE | `npm run build:web`, read the chunk sizes |
+| Landing page Lighthouse 100/100/100/100, LCP 390 ms, CLS 0.01 (local, unthrottled) | LIVE | build, `npx vite preview`, run Lighthouse and a performance trace in Chrome DevTools on http://localhost:4173/; DECISIONS.md D11 |
 | Hosted app at https://juicewrld998.github.io/tab/ | NOT LIVE | needs Pages switched on (Settings, Pages, Source: GitHub Actions); then `curl -I` the URL |
 | npm packages `@tab/core`, `@tab/chain` | NOT LIVE | not published; DECISIONS.md D11 |

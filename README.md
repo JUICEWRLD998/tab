@@ -149,7 +149,7 @@ To report a problem, see [SECURITY.md](SECURITY.md).
 - The interface offers equal splits only. The library also supports custom shares.
 - USDC only. EURC and other Arc assets are not wired in.
 - Only a browser wallet that exposes `window.ethereum` is supported. When several wallet extensions are installed the browser picks one.
-- The interface was checked with a scripted browser, an accessibility scan and a contrast and overflow sweep from 320 to 1920 px. It has had no hands-on review on real phones, and no Lighthouse run is recorded in this repo.
+- The interface was checked with a scripted browser, an accessibility scan and a contrast and overflow sweep from 320 to 1920 px. Lighthouse (mobile emulation, local preview, 2026-10-05) scored the landing page 100 for accessibility, best practices, SEO and agentic browsing; a performance trace measured LCP 390 ms and CLS 0.01 with no network throttling. It has had no hands-on review on real phones, and the other routes were not run through Lighthouse.
 
 ## Roadmap
 
