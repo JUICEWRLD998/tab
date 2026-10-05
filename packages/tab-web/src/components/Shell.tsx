@@ -88,7 +88,7 @@ function WalletButton() {
   }
   return (
     <Button variant="secondary" onClick={() => void connect()} loading={w.status === "connecting"}>
-      Connect<span className={s.long}>&nbsp;wallet</span>
+      <span>Connect<span className={s.long}> wallet</span></span>
     </Button>
   );
 }

@@ -1,5 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
-import { txUrl } from "@tab/chain";
+import { txUrl } from "@tab/chain/explorer";
 import { Receipt } from "../components/Receipt";
 import { Button, Field, LinkButton, inputClass } from "../components/ui";
 import { demo, proof } from "../data/proof";

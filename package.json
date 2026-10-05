@@ -7,11 +7,18 @@
   ],
   "scripts": {
     "test": "npm test --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "verify": "vite-node scripts/verify-tx.ts",
+    "group": "vite-node scripts/group.ts",
+    "build:web": "npm run build -w @tab/web",
+    "preview:web": "npm run preview -w @tab/web"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
     "typescript": "^5.6.0",
     "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

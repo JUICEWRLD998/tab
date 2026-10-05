@@ -1,6 +1,7 @@
 {
   "name": "@tab/core",
   "version": "0.1.0",
+  "description": "Pure TypeScript core for Tab, a group expense ledger on Arc: 6-decimal USDC money, splits, netting to at most N-1 transfers, the Memo codec and the ledger trust rules. No network.",
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
@@ -9,5 +10,27 @@
   },
   "dependencies": {
     "viem": "^2.21.0"
-  }
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./money": "./src/money.ts"
+  },
+  "license": "MIT",
+  "author": "Mustapha Fadhlullah",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JUICEWRLD998/tab.git"
+  },
+  "homepage": "https://github.com/JUICEWRLD998/tab#readme",
+  "bugs": {
+    "url": "https://github.com/JUICEWRLD998/tab/issues"
+  },
+  "keywords": [
+    "arc",
+    "usdc",
+    "expenses",
+    "netting",
+    "ledger",
+    "memo"
+  ]
 }

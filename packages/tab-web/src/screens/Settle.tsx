@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Receipt, type ReceiptLine } from "../components/Receipt";
 import { Button, LinkButton, Notice, cardClass, cx } from "../components/ui";
 import { pub } from "../lib/chain";
-import { plural, shortHash, usdc } from "../lib/format";
+import { plural, shortAddr, shortHash, usdc } from "../lib/format";
 import { debtsOf, planOf } from "../lib/group";
 import { dur, ease } from "../lib/motion";
 import { labelFor, useNames } from "../lib/names";
@@ -40,7 +40,7 @@ function FeeLine({ me, id, legs, onResult }: { me: Address; id: string; legs: Tr
   if (!state.data.ok)
     return (
       <Notice tone="error" title="A recipient is blocklisted">
-        USDC will not send to {state.data.blocked.map((a) => a.slice(0, 8) + "…").join(", ")}. Pay that person directly, outside Tab; the batch would burn gas and fail.
+        USDC will not send to {state.data.blocked.map(shortAddr).join(", ")}. Pay that person directly, outside Tab; the batch would burn gas and fail.
       </Notice>
     );
   return <p className={s.line}>Network fee about {usdc(state.data.feeUsdc)} USDC for the whole batch.</p>;
@@ -99,7 +99,7 @@ function SettleView({ id, ledger, reload }: { id: string; ledger: Ledger; reload
       setAnnounce("Checking the transfers against the chain.");
       const pf = await preflightSettle(pub, wallet.address, id, myLegs);
       if (pf.short) throw new Error(`This wallet holds ${usdc(pf.short.balance)} USDC but the batch needs about ${usdc(pf.short.needed)}.`);
-      if (!pf.ok) throw new Error(`A recipient is blocklisted (${pf.blocked.join(", ")}). Pay that person directly.`);
+      if (!pf.ok) throw new Error(`A recipient is blocklisted (${pf.blocked.map(shortAddr).join(", ")}). Pay that person directly.`);
       setPhase("signing");
       setAnnounce("Confirm in your wallet. One signature pays your transfers.");
       const tx = await settle(pub, wallet.client, id, myLegs);

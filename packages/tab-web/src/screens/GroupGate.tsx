@@ -1,5 +1,6 @@
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 import { Button, Field, LinkButton, Notice, inputClass } from "../components/ui";
+import { readMessage } from "../lib/errors";
 import { useGroup, type LoadedGroup } from "../lib/group";
 import { href, navigate } from "../lib/router";
 import s from "./GroupGate.module.css";
@@ -31,7 +32,7 @@ export function GroupGate({ id, from, children }: { id: string; from?: bigint; c
     return (
       <div className={s.empty}>
         <Notice tone="error" title="Could not read the chain">
-          {state.error.message.split("\n")[0]}
+          {readMessage(state.error)}
         </Notice>
         <div>
           <Button variant="secondary" onClick={() => reload()}>

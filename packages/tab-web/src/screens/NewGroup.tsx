@@ -11,6 +11,8 @@ import s from "./NewGroup.module.css";
 const MAX_MEMBERS = 30;
 const MAX_NAME = 40;
 
+const ZERO = "0x0000000000000000000000000000000000000000";
+
 export function NewGroup() {
   const wallet = useWallet();
   const names = useNames();
@@ -28,13 +30,15 @@ export function NewGroup() {
     const valid = extractAddresses(text);
     // A token that starts with 0x but is not 40 hex characters is a typo worth naming, not something to skip silently.
     const bad = (text.match(/0x[0-9a-zA-Z]*/g) ?? []).filter((t) => !/^0x[0-9a-fA-F]{40}$/.test(t));
+    const zero = valid.includes(ZERO);
     const members = me && !valid.includes(me) ? [me, ...valid] : valid;
-    return { members, bad };
+    return { members, bad, zero };
   }, [text, me]);
 
   const nameError = touched && !name.trim() ? "Give the group a name." : touched && name.trim().length > MAX_NAME ? `Keep it under ${MAX_NAME} characters.` : null;
-  const listError =
-    parsed.bad.length > 0
+  const listError = parsed.zero
+    ? "The zero address cannot be in a group. Remove 0x000…000."
+    : parsed.bad.length > 0
       ? `${parsed.bad[0]!.slice(0, 14)}… is not a valid address (0x and 40 hex characters).`
       : touched && parsed.members.length < 2
         ? "A group needs at least two people. Paste the other addresses."
@@ -47,7 +51,7 @@ export function NewGroup() {
     setTouched(true);
     setSubmitError(null);
     if (wallet.status !== "connected") return void connect();
-    if (!name.trim() || name.trim().length > MAX_NAME || parsed.members.length < 2 || parsed.members.length > MAX_MEMBERS || parsed.bad.length) return;
+    if (!name.trim() || name.trim().length > MAX_NAME || parsed.members.length < 2 || parsed.members.length > MAX_MEMBERS || parsed.bad.length || parsed.zero) return;
     setBusy(true);
     try {
       const id = newGroupId();

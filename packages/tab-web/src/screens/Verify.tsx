@@ -5,6 +5,7 @@ import { Receipt } from "../components/Receipt";
 import { Button, Field, LinkButton, Notice, inputClass } from "../components/ui";
 import { proof } from "../data/proof";
 import { pub } from "../lib/chain";
+import { readMessage } from "../lib/errors";
 import { isHash, plural, shortAddr, shortHash, usdc } from "../lib/format";
 import { labelFor, useNames } from "../lib/names";
 import { href, navigate } from "../lib/router";
@@ -56,8 +57,8 @@ function Result({ hash, from }: { hash: `0x${string}`; from?: bigint }) {
     const msg = state.error.message.split("\n")[0] ?? "";
     const notFound = /not be found|could not be found|not found/i.test(state.error.message) || state.error.name === "TransactionReceiptNotFoundError";
     return (
-      <Notice tone="error" title={notFound ? "No such transaction" : "Could not verify"}>
-        {notFound ? "Arc mainnet has no transaction with this hash. Check it for a typo." : msg}
+      <Notice tone="error" title={notFound ? "No such transaction" : state.error.name === "NotTabTxError" ? "Not a Tab transaction" : "Could not verify"}>
+        {notFound ? "Arc mainnet has no transaction with this hash. Check it for a typo." : readMessage(state.error)}
       </Notice>
     );
   }

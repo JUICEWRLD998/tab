@@ -1,0 +1,25 @@
+# Tab
+
+> Tab is a serverless group expense ledger on Arc mainnet (chain id 5042). Expenses are `Memo` events. Settlement is one netted `Multicall3From.aggregate3` batch per debtor, with a memo per leg. No backend, no database, no custody contract. MIT licensed, by Mustapha Fadhlullah (GitHub: JUICEWRLD998).
+
+Check the main claim without a wallet (Node 22+): run `npm install`, then `npm run verify -- 0xf0a3c947b36eaf6a8c09a064454cded790c37a141fccb50821553cbfb34463a4`. It rebuilds a real 3-leg settlement from its hash and exits 0 when verified. `npm test` runs 98 tests with no network.
+
+## Docs
+
+- [README](https://github.com/JUICEWRLD998/tab/blob/main/README.md): what it is, what it uses Arc for, proof transactions, how to check them, known limits
+- [CLAIMS](https://github.com/JUICEWRLD998/tab/blob/main/CLAIMS.md): every public claim mapped to a command or a mainnet transaction
+- [DECISIONS](https://github.com/JUICEWRLD998/tab/blob/main/DECISIONS.md): dated design decisions, each settled by a transaction or a command
+- [SECURITY](https://github.com/JUICEWRLD998/tab/blob/main/SECURITY.md): scope, known and accepted risks
+
+## Code
+
+- [tab-core](https://github.com/JUICEWRLD998/tab/tree/main/packages/tab-core): money, splits, netting (at most N-1 transfers), memo codec, ledger trust rules
+- [tab-chain](https://github.com/JUICEWRLD998/tab/tree/main/packages/tab-chain): log reader, write path, settle batch, preflight, verifyTx
+- [tab-web](https://github.com/JUICEWRLD998/tab/tree/main/packages/tab-web): the static web app and its browser drive scripts
+
+## Arc features used
+
+- [Memo predeploy](https://explorer.arc.io/address/0x5294E9927c3306DcBaDb03fe70b92e01cCede505): every group action is a memo; the indexed memoId is keccak256("tab:" + groupId)
+- [Multicall3From predeploy](https://explorer.arc.io/address/0x522fAf9A91c41c443c66765030741e4AaCe147D0): one signature pays several legs with msg.sender preserved
+- [Native USDC, 6-decimal ERC-20 interface](https://explorer.arc.io/address/0x3600000000000000000000000000000000000000): all amounts in 6-decimal base units
+- 20 gwei fee floor, USDC blocklist pre-check, deterministic finality, EOA-only callers

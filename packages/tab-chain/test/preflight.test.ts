@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { PublicClient } from "viem";
-import { preflightSettle } from "../src/settle";
+import { preflightMessage, preflightSettle, settle } from "../src/settle";
 
-const A = "0x00000000000000000000000000000000000000a1" as const;
-const B = "0x00000000000000000000000000000000000000b2" as const;
-const C = "0x00000000000000000000000000000000000000c3" as const;
+const A = "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1" as const;
+const B = "0xb2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2" as const;
+const C = "0xc3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3" as const;
 
-/** Fake client: only the calls preflightSettle makes. `blocked` addresses are blocklisted, `balance` is the signer's USDC. */
-function fake(opts: { balance: bigint; blocked?: string[]; gas?: bigint }) {
+/** Scripted client: only the calls preflightSettle makes. `blocked` addresses are blocklisted, `balance` is the signer's USDC. */
+function scripted(opts: { balance: bigint; blocked?: string[]; gas?: bigint }) {
   const calls: string[] = [];
   const client = {
     readContract: async (p: { functionName: string; args: readonly string[] }) => {
@@ -31,30 +31,56 @@ const legs = [
 
 describe("preflightSettle", () => {
   it("planted control: a funded signer passes with a fee estimate", async () => {
-    const { client } = fake({ balance: 1_000_000n });
+    const { client } = scripted({ balance: 1_000_000n });
     const p = await preflightSettle(client, A, "g", legs);
     expect(p.ok).toBe(true);
     expect(p.short).toBeUndefined();
     expect(p.feeUsdc).toBe((140_000n * 20_000_000_000n) / 10n ** 12n); // 2800 base units = 0.0028 USDC
   });
   it("a signer who cannot cover the legs is told so, and gas is never estimated (it would revert with no reason)", async () => {
-    const { client, calls } = fake({ balance: 200_000n });
+    const { client, calls } = scripted({ balance: 200_000n });
     const p = await preflightSettle(client, A, "g", legs);
     expect(p.ok).toBe(false);
     expect(p.short).toEqual({ balance: 200_000n, needed: 220_000n });
     expect(calls).not.toContain("estimateGas");
   });
   it("covers the legs but not the fee: short by the fee", async () => {
-    const { client } = fake({ balance: 221_000n });
+    const { client } = scripted({ balance: 221_000n });
     const p = await preflightSettle(client, A, "g", legs);
     expect(p.ok).toBe(false);
     expect(p.short!.needed).toBe(220_000n + p.feeUsdc);
   });
   it("a blocklisted recipient is reported before anything else", async () => {
-    const { client, calls } = fake({ balance: 1_000_000n, blocked: [C] });
+    const { client, calls } = scripted({ balance: 1_000_000n, blocked: [C] });
     const p = await preflightSettle(client, A, "g", legs);
     expect(p.ok).toBe(false);
     expect(p.blocked).toEqual([C]);
     expect(calls).not.toContain("balanceOf");
+  });
+});
+
+describe("settle() refuses before it can send", () => {
+  const wallet = (sent: string[]) =>
+    ({ account: { address: A }, chain: undefined, sendTransaction: async () => { sent.push("sent"); return "0x" + "1".repeat(64); } }) as never;
+  it("planted control: a balance problem is described as a balance problem, not a blocklist", async () => {
+    const { client } = scripted({ balance: 200_000n });
+    const sent: string[] = [];
+    await expect(settle(client, wallet(sent), "g", legs)).rejects.toThrow(/holds 200000 base units.*needs 220000/);
+    expect(sent).toEqual([]);
+  });
+  it("a blocklisted recipient is named and nothing is sent", async () => {
+    const { client } = scripted({ balance: 1_000_000n, blocked: [B] });
+    const sent: string[] = [];
+    await expect(settle(client, wallet(sent), "g", legs)).rejects.toThrow(/blocklisted address in batch: 0xb2b2/);
+    expect(sent).toEqual([]);
+  });
+  it("legs owed by someone else are refused before any network call", async () => {
+    const { client, calls } = scripted({ balance: 1_000_000n });
+    await expect(settle(client, wallet([]), "g", [{ from: B, to: C, amount: 1n }])).rejects.toThrow(/only sign legs it owes/);
+    expect(calls).toEqual([]);
+  });
+  it("preflightMessage covers every failure shape", () => {
+    expect(preflightMessage({ legs, blocked: [C], gas: 0n, feeUsdc: 0n, ok: false })).toMatch(/blocklisted/);
+    expect(preflightMessage({ legs, blocked: [], short: { balance: 1n, needed: 2n }, gas: 0n, feeUsdc: 0n, ok: false })).toMatch(/needs 2/);
   });
 });

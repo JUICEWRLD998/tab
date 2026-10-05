@@ -1,13 +1,15 @@
-import { Component, useEffect, useMemo, type ErrorInfo, type ReactNode } from "react";
+import { Component, Suspense, lazy, useEffect, useMemo, type ErrorInfo, type ReactNode } from "react";
 import { Shell } from "./components/Shell";
 import { Notice, LinkButton } from "./components/ui";
 import { parseRoute, useHash, href, type Route } from "./lib/router";
 import { wireWalletEvents } from "./lib/wallet";
-import { Group } from "./screens/Group";
 import { Home } from "./screens/Home";
-import { NewGroup } from "./screens/NewGroup";
-import { Settle } from "./screens/Settle";
-import { Verify } from "./screens/Verify";
+
+// Screens that read the chain load on demand, so the landing page does not pay for viem and the ledger code.
+const Group = lazy(() => import("./screens/Group").then((m) => ({ default: m.Group })));
+const NewGroup = lazy(() => import("./screens/NewGroup").then((m) => ({ default: m.NewGroup })));
+const Settle = lazy(() => import("./screens/Settle").then((m) => ({ default: m.Settle })));
+const Verify = lazy(() => import("./screens/Verify").then((m) => ({ default: m.Verify })));
 
 class Boundary extends Component<{ children: ReactNode; resetKey: string }, { error: Error | null }> {
   state = { error: null as Error | null };
@@ -87,7 +89,11 @@ export function App() {
 
   return (
     <Shell route={route}>
-      <Boundary resetKey={hash}><Screen route={route} /></Boundary>
+      <Boundary resetKey={hash}>
+        <Suspense fallback={<p role="status" className="sr-only">Loading</p>}>
+          <Screen route={route} />
+        </Suspense>
+      </Boundary>
     </Shell>
   );
 }
