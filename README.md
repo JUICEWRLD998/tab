@@ -14,7 +14,7 @@ There is no server, no database, no account system and no custody contract. The 
 | Chain layer (reads, writes, settle batch, preflight, verify) | LIVE | `packages/tab-chain`, 29 tests plus 5 live-network tests |
 | Web app, run locally | LIVE | `packages/tab-web`, 15 tests plus browser drives against mainnet |
 | Settlement on Arc mainnet, 3 legs, one signature | LIVE | tx [`0xf0a3c947…63a4`](https://explorer.arc.io/tx/0xf0a3c947b36eaf6a8c09a064454cded790c37a141fccb50821553cbfb34463a4) |
-| Hosted app | NOT LIVE | `https://juicewrld998.github.io/tab/` once GitHub Pages is switched on (see "Deploy") |
+| Hosted app | NOT LIVE | `https://juicewrld998.github.io/tab/` after a deploy (see "Deploy") |
 | npm packages | NOT LIVE | the two libraries are structured for it but not published |
 
 Every claim in this README is mapped to a command or transaction in [CLAIMS.md](CLAIMS.md). The reasons behind each design choice, with the transaction that settled it, are in [DECISIONS.md](DECISIONS.md).
@@ -186,7 +186,7 @@ const check = await verifyTx(client, "0xf0a3c947b36eaf6a8c09a064454cded790c37a14
 
 ## Deploy
 
-The app is static. `npm run build:web` writes `packages/tab-web/dist`, which any static host can serve, including a sub-path such as GitHub Pages (asset paths are relative and routes use the URL hash). `.github/workflows/pages.yml` builds and publishes it from `main`. Set `SITE_URL` at build time if you host it somewhere other than the default, so the social card image URL is correct.
+The app is static. `npm run build:web` writes `packages/tab-web/dist`, which any static host can serve, including a sub-path such as GitHub Pages (asset paths are relative and routes use the URL hash). `docs/deploy/pages.yml` and `docs/deploy/ci.yml` are ready-made GitHub Actions workflows (copy them to `.github/workflows/` to use them). They are not enabled in this repository, because GitHub Actions is currently blocked on the owner's account by a billing lock, so every run failed before it started. Set `SITE_URL` at build time if you host it somewhere other than the default, so the social card image URL is correct.
 
 ## About
 
