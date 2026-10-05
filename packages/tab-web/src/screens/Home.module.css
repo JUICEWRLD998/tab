@@ -68,6 +68,8 @@
   display: grid;
   gap: var(--s4);
   align-content: start;
+  padding-top: var(--s4);
+  border-top: 1px solid var(--line);
 }
 .panel h2 {
   font-size: var(--step-1);
@@ -103,7 +105,7 @@
 }
 @media (min-width: 800px) {
   .steps {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1.5fr 1fr 1fr;
     gap: var(--s6);
   }
 }

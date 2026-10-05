@@ -74,10 +74,14 @@ try {
   }
 
   if (MODE === "settle" || MODE === "all") {
-    const g = await buildGroup("E2E check");
+    // GROUP_ID and GROUP_FROM reuse a group a previous run already built, so a failed run does not pay for it twice.
+    const g = process.env.GROUP_ID ? { id: process.env.GROUP_ID, from: process.env.GROUP_FROM } : await buildGroup("E2E check");
     results.e2e = g;
-    await connectAs("D");
+    await wallet.use("D");
     await cdp.goto(`${BASE}/#/g/${encodeURIComponent(g.id)}/settle?from=${g.from}`);
+    await cdp.waitFor(`document.querySelector('h1')?.innerText === 'Settle up'`, { timeout: 90000 });
+    if (!(await cdp.eval(`!!document.querySelector('[title^="0x"]')`))) await cdp.clickText("Connect");
+    await connectAs("D");
     await cdp.waitFor(`document.querySelector('h1')?.innerText === 'Settle up'`, { timeout: 90000 });
     await cdp.waitFor(`document.body.innerText.includes('Settle my 3 transfers')`, { timeout: 60000 });
     await cdp.waitFor(`document.body.innerText.includes('Network fee about')`, { timeout: 60000, label: "fee estimate shown before signing" });

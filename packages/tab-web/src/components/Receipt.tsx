@@ -55,7 +55,7 @@ export function Receipt({
   totalValue?: string;
   meta?: { k: string; v: ReactNode }[];
   barcodeSeed?: string;
-  /** false hides the lines (they keep their space, so nothing shifts when they print). */
+  /** false shows the lines as faint ghosts of what will print (they keep their space, so nothing shifts when they print). */
   printed?: boolean;
   stamped?: boolean;
   stampText?: string;
@@ -77,7 +77,7 @@ export function Receipt({
               key={l.id}
               className={cx(s.line, l.mine && s.mine)}
               initial={false}
-              animate={{ opacity: printed ? 1 : 0, y: printed ? 0 : 8 }}
+              animate={{ opacity: printed ? 1 : 0.2, y: printed ? 0 : 8 }}
               transition={{ duration: dur.short, ease: ease.out, delay: printed ? i * 0.11 : 0 }}
             >
               <span className={s.left}>{l.left}</span>
@@ -87,7 +87,7 @@ export function Receipt({
         </ul>
       )}
       {totalLabel && (
-        <m.div className={s.total} initial={false} animate={{ opacity: printed ? 1 : 0 }} transition={{ duration: dur.short, ease: ease.out, delay: printed ? 0.1 + lines.length * 0.11 : 0 }}>
+        <m.div className={s.total} initial={false} animate={{ opacity: printed ? 1 : 0.2 }} transition={{ duration: dur.short, ease: ease.out, delay: printed ? 0.1 + lines.length * 0.11 : 0 }}>
           <span>{totalLabel}</span>
           <span>{totalValue}</span>
         </m.div>

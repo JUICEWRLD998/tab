@@ -1,8 +1,8 @@
 import { useId, useState, type FormEvent } from "react";
 import { txUrl } from "@tab/chain";
 import { Receipt } from "../components/Receipt";
-import { Button, Field, LinkButton, cardClass, inputClass } from "../components/ui";
-import { proof } from "../data/proof";
+import { Button, Field, LinkButton, inputClass } from "../components/ui";
+import { demo, proof } from "../data/proof";
 import { isHash, shortAddr, shortHash, usdc } from "../lib/format";
 import { href, navigate } from "../lib/router";
 import s from "./Home.module.css";
@@ -26,7 +26,7 @@ function OpenGroup() {
   }
 
   return (
-    <form className={`${cardClass} ${s.panel}`} onSubmit={submit} noValidate>
+    <form className={s.panel} onSubmit={submit} noValidate>
       <h2>Open a group</h2>
       <p>Paste the group id. If the group is more than a few hours old, add the block it was created in; a shared link already carries it.</p>
       <div className={`${s.row} ${s.rowSplit}`}>
@@ -60,7 +60,7 @@ function VerifyBox() {
   }
 
   return (
-    <form className={`${cardClass} ${s.panel}`} onSubmit={submit} noValidate>
+    <form className={s.panel} onSubmit={submit} noValidate>
       <h2>Check a payment</h2>
       <p>Paste a settlement transaction hash. Tab rebuilds the group from the chain and checks every leg against the transfers the transaction actually made.</p>
       <Field label="Transaction hash" htmlFor={id} error={err}>
@@ -86,11 +86,14 @@ export function Home() {
           </h1>
           <p className={s.lede}>Tab keeps a shared tab on Arc. Everyone logs what they paid, Tab nets the debts, and each person who owes signs once. No server, no account, nobody holding the money.</p>
           <div className={s.actions}>
-            <LinkButton variant="primary" href={href.new()}>
+            <LinkButton variant="primary" href={href.group(demo.id, demo.from)}>
+              Open the demo group
+            </LinkButton>
+            <LinkButton variant="secondary" href={href.new()}>
               Start a group
             </LinkButton>
-            <LinkButton variant="secondary" href={href.verify(proof.hash, proof.createdBlock)}>
-              See a settled group
+            <LinkButton variant="quiet" href={href.verify(proof.hash, proof.createdBlock)}>
+              See a settled one
             </LinkButton>
           </div>
           <p className={s.proofLine}>

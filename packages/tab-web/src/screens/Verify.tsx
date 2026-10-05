@@ -198,7 +198,7 @@ function Result({ hash, from }: { hash: `0x${string}`; from?: bigint }) {
 
           <section aria-labelledby="own-h" className={s.evidence}>
             <h3 id="own-h">Check it without Tab</h3>
-            <pre className={s.code}>{`cast receipt ${v.hash} \\\n  --rpc-url https://rpc.mainnet.arc.io`}</pre>
+            <pre className={s.code} tabIndex={0} aria-label="Command to check the transaction receipt">{`cast receipt ${v.hash} \\\n  --rpc-url https://rpc.mainnet.arc.io`}</pre>
             <div>
               <LinkButton variant="secondary" external href={txUrl(v.hash)}>
                 Open on the explorer

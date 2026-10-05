@@ -18,6 +18,8 @@ export interface LoadedGroup {
 export async function loadGroup(id: string, from: bigint | undefined, onProgress: (msg: string) => void, minHead?: bigint): Promise<LoadedGroup | null> {
   onProgress("reading the chain");
   if (minHead !== undefined) await waitForHead(pub, minHead);
+  // A fresh link carries the block the group was just created in. The load-balanced RPC can serve a head behind that block (seen live 2026-10-05), which would read as "no group". Wait for it, but never hang on a link with a bogus block.
+  if (from !== undefined) await waitForHead(pub, from, { timeoutMs: 10_000 }).catch(() => undefined);
   const head = await withRetry(() => pub.getBlockNumber());
   const { ledger, scannedFrom } = await findLedger(pub, groupMemoId(id), { anchor: head, fromBlock: from, onProgress });
   return ledger ? { ledger, scannedFrom, head } : null;

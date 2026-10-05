@@ -31,6 +31,12 @@ function FeeLine({ me, id, legs, onResult }: { me: Address; id: string; legs: Tr
   }, [state]);
   if (state.status === "loading") return <p className={s.line}>Estimating the network fee…</p>;
   if (state.status === "error") return <Notice tone="warn" title="Could not estimate the fee">{state.error.message.split("\n")[0]}. You can still try to settle.</Notice>;
+  if (state.data.short)
+    return (
+      <Notice tone="error" title="This wallet cannot cover the batch">
+        It holds {usdc(state.data.short.balance)} USDC and the transfers plus the network fee need about {usdc(state.data.short.needed)} USDC. Add USDC on Arc, or pay part of it another way.
+      </Notice>
+    );
   if (!state.data.ok)
     return (
       <Notice tone="error" title="A recipient is blocklisted">
@@ -92,6 +98,7 @@ function SettleView({ id, ledger, reload }: { id: string; ledger: Ledger; reload
       setPhase("checking");
       setAnnounce("Checking the transfers against the chain.");
       const pf = await preflightSettle(pub, wallet.address, id, myLegs);
+      if (pf.short) throw new Error(`This wallet holds ${usdc(pf.short.balance)} USDC but the batch needs about ${usdc(pf.short.needed)}.`);
       if (!pf.ok) throw new Error(`A recipient is blocklisted (${pf.blocked.join(", ")}). Pay that person directly.`);
       setPhase("signing");
       setAnnounce("Confirm in your wallet. One signature pays your transfers.");
@@ -144,7 +151,6 @@ function SettleView({ id, ledger, reload }: { id: string; ledger: Ledger; reload
         <section className={cx(cardClass, s.before)} aria-labelledby="debts-h">
           <div className={s.beforeHead}>
             <h2 id="debts-h">Open debts</h2>
-            <span className={s.count}>{view.debts.length}</span>
           </div>
           <ul className={s.debts}>
             {view.debts.map((d, i) => (
@@ -157,7 +163,7 @@ function SettleView({ id, ledger, reload }: { id: string; ledger: Ledger; reload
                 transition={{ duration: dur.long, ease: ease.out, delay: printed ? i * 0.03 : 0 }}
               >
                 <span>
-                  {labelFor(d.from, names, me)} owes {labelFor(d.to, names, me)}
+                  {labelFor(d.from, names, me)} {me && d.from === me ? "owe" : "owes"} {labelFor(d.to, names, me)}
                 </span>
                 <span className={s.amt}>{usdc(d.amount)}</span>
               </m.li>

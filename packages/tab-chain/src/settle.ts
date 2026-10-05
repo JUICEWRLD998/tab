@@ -43,9 +43,13 @@ export function decodeSettleBatch(data: Hex): { target: Address; memoId: Hex; ca
   });
 }
 
+const balanceAbi = parseAbi(["function balanceOf(address) view returns (uint256)"]);
+
 export interface Preflight {
   legs: Transfer[];
   blocked: Address[];
+  /** Set when the signer cannot cover the legs (plus the fee, once it is known). Amounts in 6-decimal USDC base units. */
+  short?: { balance: bigint; needed: bigint };
   /** Gas units from eth_estimateGas, and the cost in USDC base units (6 decimals). */
   gas: bigint;
   feeUsdc: bigint;
@@ -57,11 +61,16 @@ export async function preflightSettle(pub: PublicClient, signer: Address, groupI
   const blocked: Address[] = [];
   for (const addr of new Set([normalize(signer), ...legs.map((l) => l.to)])) if (await isBlocklisted(pub, addr)) blocked.push(addr);
   if (blocked.length) return { legs, blocked, gas: 0n, feeUsdc: 0n, ok: false };
+  // A batch the signer cannot fund reverts inside estimateGas with no reason, so check the balance first and say so plainly.
+  const total = legs.reduce((a, l) => a + l.amount, 0n);
+  const balance = await pub.readContract({ address: USDC_ADDRESS, abi: balanceAbi, functionName: "balanceOf", args: [normalize(signer)] });
+  if (balance < total) return { legs, blocked, short: { balance, needed: total }, gas: 0n, feeUsdc: 0n, ok: false };
   const tx = buildSettleBatch(groupId, legs);
   const fees = await feeOverrides(pub);
   const gas = await pub.estimateGas({ account: signer, to: tx.to, data: tx.data, ...fees });
   // native balance and gas price are 18-decimal; the ERC-20 view is 6. Convert once, here.
   const feeUsdc = (gas * fees.maxFeePerGas) / 10n ** 12n;
+  if (balance < total + feeUsdc) return { legs, blocked, short: { balance, needed: total + feeUsdc }, gas, feeUsdc, ok: false };
   return { legs, blocked, gas, feeUsdc, ok: true };
 }
 

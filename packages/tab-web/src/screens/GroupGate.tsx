@@ -65,7 +65,10 @@ export function GroupGate({ id, from, children }: { id: string; from?: bigint; c
             Scan from there
           </Button>
         </form>
-        <div>
+        <div className={s.retry}>
+          <Button variant="secondary" onClick={() => reload()}>
+            Check again
+          </Button>
           <LinkButton variant="quiet" href={href.home()}>
             Back to start
           </LinkButton>

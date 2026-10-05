@@ -28,6 +28,7 @@
 .primary {
   background: var(--accent);
   color: var(--on-accent);
+  border: 0;
 }
 .secondary {
   background: transparent;
@@ -36,6 +37,7 @@
 }
 .quiet {
   background: transparent;
+  border: 0;
   color: var(--muted);
   padding: 0 var(--s3);
 }
@@ -64,6 +66,7 @@
 .btn[aria-disabled="true"] {
   opacity: 0.45;
   cursor: not-allowed;
+  filter: saturate(0.35);
 }
 
 .block {
@@ -148,7 +151,8 @@ textarea.input {
 /* surfaces */
 .card {
   background: var(--raised);
-  border: 1px solid var(--line);
+  /* a hairline ring, not a border: inputs and buttons inside a card carry their own borders */
+  box-shadow: 0 0 0 1px var(--line);
   border-radius: var(--radius);
   padding: var(--s5);
 }

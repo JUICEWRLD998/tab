@@ -62,12 +62,14 @@ export async function installWallet(cdp, keys, dir = process.env.TAB_WALLET_DIR)
     if (name !== "__walletBridge") return;
     const { id, method, params } = JSON.parse(payload);
     state.requests.push(method);
+    const t0 = Date.now();
     let out;
     try {
       out = { ok: true, result: await handle(method, params ?? []) };
     } catch (e) {
       out = { ok: false, message: e.shortMessage ?? e.message, code: e.code ?? e.cause?.code ?? -32000 };
     }
+    if (method === "eth_sendTransaction") console.log("  wallet:", method, state.current, out.ok ? out.result.slice(0, 12) : "ERR " + out.message, `${Date.now() - t0}ms`);
     await cdp.eval(`window.__walletResolve(${id}, ${JSON.stringify(out)})`);
   });
 
