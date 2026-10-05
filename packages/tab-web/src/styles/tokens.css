@@ -1,0 +1,111 @@
+/* Tab design tokens. Every colour and font in page CSS is var(--...) from here. No raw colour anywhere else.
+   Measured by scripts/palette.mjs (contrast, dE76 between role hues, chroma ratio). Change a value, re-run it.
+   Vocabulary: the bar tab and the paper receipt. Ground is blue-black slate, paper is warm thermal stock, stamp is receipt-stamp red. */
+
+:root {
+  color-scheme: dark;
+
+  /* surfaces, tinted toward hue 248 */
+  --ground: oklch(0.165 0.022 248);
+  --raised: oklch(0.205 0.026 248);
+  --sunken: oklch(0.14 0.02 248);
+  --hover: oklch(0.245 0.028 248);
+  --line: oklch(0.31 0.03 248);
+
+  /* ink */
+  --ink: oklch(0.955 0.012 230);
+  --muted: oklch(0.74 0.025 235);
+
+  /* the one call-to-action colour, plus its ink */
+  --accent: oklch(0.83 0.145 168);
+  --accent-press: oklch(0.76 0.14 168);
+  --on-accent: oklch(0.2 0.04 168);
+
+  /* support hues, each with a job */
+  --amber: oklch(0.84 0.13 82); /* open debt, waiting */
+  --coral: oklch(0.74 0.15 22); /* error, blocked, rejected */
+  --sky: oklch(0.78 0.1 235); /* links, info, data */
+
+  /* the receipt: warm paper that stays paper in both themes */
+  --paper: oklch(0.945 0.035 88);
+  --paper-ink: oklch(0.27 0.03 60);
+  --paper-faint: oklch(0.5 0.03 70);
+  --paper-rule: oklch(0.8 0.035 80);
+  --stamp: oklch(0.5 0.17 28);
+
+  --focus: oklch(0.83 0.145 168);
+
+  /* type */
+  --font-ui: "Familjen Grotesk Variable", "Familjen Grotesk", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.875rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.5vw, 1.4rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.4vw, 2.3rem);
+  --step-3: clamp(2.2rem, 1.6rem + 3vw, 4rem);
+
+  /* space, 4px base */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2rem;
+  --s7: 3rem;
+  --s8: 4.5rem;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --target: 44px;
+  --shell: 1120px;
+
+  /* motion: mirrored in src/lib/motion.ts. Change both together. */
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px oklch(0.05 0.02 248 / 0.45);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ground: oklch(0.965 0.012 225);
+  --raised: oklch(0.99 0.009 225);
+  --sunken: oklch(0.93 0.015 225);
+  --hover: oklch(0.945 0.015 225);
+  --line: oklch(0.86 0.018 230);
+  --ink: oklch(0.22 0.03 248);
+  --muted: oklch(0.44 0.03 245);
+  --accent: oklch(0.5 0.1 168);
+  --accent-press: oklch(0.44 0.095 168);
+  --on-accent: oklch(0.985 0.01 168);
+  --amber: oklch(0.47 0.1 70);
+  --coral: oklch(0.5 0.16 24);
+  --sky: oklch(0.46 0.11 240);
+  --focus: oklch(0.5 0.1 168);
+  --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.7) inset, 0 6px 20px oklch(0.4 0.04 248 / 0.14);
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ground: oklch(0.965 0.012 225);
+    --raised: oklch(0.99 0.009 225);
+    --sunken: oklch(0.93 0.015 225);
+    --hover: oklch(0.945 0.015 225);
+    --line: oklch(0.86 0.018 230);
+    --ink: oklch(0.22 0.03 248);
+    --muted: oklch(0.44 0.03 245);
+    --accent: oklch(0.5 0.1 168);
+    --accent-press: oklch(0.44 0.095 168);
+    --on-accent: oklch(0.985 0.01 168);
+    --amber: oklch(0.47 0.1 70);
+    --coral: oklch(0.5 0.16 24);
+    --sky: oklch(0.46 0.11 240);
+    --focus: oklch(0.5 0.1 168);
+    --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.7) inset, 0 6px 20px oklch(0.4 0.04 248 / 0.14);
+  }
+}

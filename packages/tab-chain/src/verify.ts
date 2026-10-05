@@ -1,6 +1,6 @@
 import { decodeEventLog, parseAbi, type Hex, type PublicClient } from "viem";
-import { buildLedger, decodeMemoLog, decodeTabMemo, MEMO_ADDRESS, MEMO_TOPIC0, settleCallDataHash, USDC_ADDRESS, type Address, type Amount, type Ledger, type TabMemo } from "@tab/core";
-import { fetchMemoEntriesById } from "./read";
+import { decodeMemoLog, decodeTabMemo, MEMO_ADDRESS, MEMO_TOPIC0, settleCallDataHash, USDC_ADDRESS, type Address, type Amount, type Ledger, type TabMemo } from "@tab/core";
+import { findLedger } from "./read";
 import { withRetry } from "./retry";
 
 const transferEvent = parseAbi(["event Transfer(address indexed from, address indexed to, uint256 value)"]);
@@ -93,10 +93,6 @@ export interface VerifyTxOptions {
   onProgress?: (msg: string) => void;
 }
 
-/** First look 40k blocks back (about 6 hours); if the creation memo is not there, walk back in steps up to this cap. */
-export const LOOKBACK_STEP = 40_000n;
-export const DEFAULT_LOOKBACK = 400_000n;
-
 export async function verifyTx(client: PublicClient, hash: Hex, opts: VerifyTxOptions = {}): Promise<TxVerification> {
   opts.onProgress?.("reading receipt");
   const receipt = await withRetry(() => client.getTransactionReceipt({ hash }));
@@ -105,22 +101,10 @@ export async function verifyTx(client: PublicClient, hash: Hex, opts: VerifyTxOp
   if (facts.memos.length === 0) throw new Error("this tx has no Memo events");
   const memoIds = [...new Set(facts.memos.map((m) => m.memoId))];
   const legs = checkLegs(facts);
-  const cap = opts.lookback ?? DEFAULT_LOOKBACK;
-  const floor = (n: bigint) => (n > 0n ? n : 0n);
 
   // A Tab batch is one group. If a tx mixes memoIds, verify the first and say so through memoIds.length.
   opts.onProgress?.("rebuilding the group from chain logs");
-  let scannedFrom = opts.fromBlock ?? floor(receipt.blockNumber - LOOKBACK_STEP);
-  let entries = await fetchMemoEntriesById(client, memoIds[0]!, { fromBlock: scannedFrom, minHead: receipt.blockNumber });
-  let ledger = buildLedger(memoIds[0]!, entries);
-  // Walk further back only when the caller did not pin a start block and the creation memo is still missing.
-  while (!ledger && opts.fromBlock === undefined && scannedFrom > 0n && receipt.blockNumber - scannedFrom < cap) {
-    const from = floor(scannedFrom - LOOKBACK_STEP);
-    opts.onProgress?.(`group not found yet, scanning back to block ${from}`);
-    entries = [...(await fetchMemoEntriesById(client, memoIds[0]!, { fromBlock: from, toBlock: scannedFrom - 1n })), ...entries];
-    scannedFrom = from;
-    ledger = buildLedger(memoIds[0]!, entries);
-  }
+  const { ledger, scannedFrom } = await findLedger(client, memoIds[0]!, { anchor: receipt.blockNumber, fromBlock: opts.fromBlock, lookback: opts.lookback, minHead: receipt.blockNumber, onProgress: opts.onProgress });
   const legsInLedger = ledger ? ledger.settled.filter((s) => s.txHash === hash).length : 0;
   return { hash, blockNumber: receipt.blockNumber, signer: receipt.from.toLowerCase() as Address, facts, legs, memoIds, ledger, scannedFrom, legsInLedger };
 }
