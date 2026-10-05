@@ -67,7 +67,8 @@ export function buildLedger(groupId: string, entries: LedgerEntry[]): Ledger | n
 
     if (m.kind === "group") {
       if (creator) { rejected.push({ entry: e, reason: "group already created" }); continue; }
-      const list = m.members.map(normalize);
+      let list: Address[];
+      try { list = m.members.map(normalize); } catch { rejected.push({ entry: e, reason: "group lists an invalid or zero address" }); continue; }
       if (list.length < 2 || !list.includes(sender)) { rejected.push({ entry: e, reason: "creator must be a member of a 2+ member group" }); continue; }
       creator = sender; name = m.name; members = new Set(list); created = { blockNumber: e.blockNumber, txHash: e.txHash };
       continue;
