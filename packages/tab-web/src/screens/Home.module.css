@@ -82,9 +82,9 @@
   display: grid;
   gap: var(--s3);
 }
-@media (min-width: 480px) {
+@media (min-width: 900px) {
   .rowSplit {
-    grid-template-columns: 1fr 9rem;
+    grid-template-columns: minmax(0, 1fr) 12rem;
   }
 }
 
