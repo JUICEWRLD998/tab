@@ -9,4 +9,5 @@ Every README claim, mapped to a command or tx hash that reproduces it. Status wo
 | The ledger rebuilds from chain data alone | LIVE | `LIVE=1 TAB_WALLET_DIR=<dir> npx vitest run packages/tab-chain/test/live.test.ts` (needs a funded wallet) |
 | Outsiders cannot forge expenses or settle claims | LIVE | `packages/tab-core/test/ledger.test.ts` (planted attacker cases) |
 | Netting gives at most N-1 transfers and zeroes every balance | LIVE | `packages/tab-core/test/netting.test.ts` (300 seeded cases) |
-| Verify page, web app | NOT LIVE | Phase 4 and 5 |
+| A tx hash alone reproduces a settle: legs, per-leg transfer, rebuilt group | LIVE | `LIVE=1 npx vitest run packages/tab-chain/test/verify.live.test.ts` (read-only, no wallet); DECISIONS.md D8 |
+| Web app and verify page | NOT LIVE | Phase 5 |
