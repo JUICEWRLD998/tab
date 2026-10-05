@@ -23,5 +23,10 @@ Deploy wallet (throwaway, key held off-repo): `0xe874C32569a28B2D0bCa07Ef25F0ec0
 - Note: one signature moves value **only from the signer**. Settle legs are therefore the signer's own debts. See D4.
 
 ### D3. Which log the indexer reads
-- Each USDC transfer emits **two** `Transfer` logs: one from the ERC-20 interface `0x3600…0000` and one from a system emitter `0xffff…fffE`-style address (`0xffffffffffffffffffffffffffffffffffffffff` prefix seen in the tx). Counting both would double every amount.
-- Decision: the ledger reads **Memo events only** (they carry `memoId`, the call-data hash and our data). It never sums raw `Transfer` logs. The verify page matches a settle leg to its transfer by `callDataHash`.
+- Each USDC transfer emits **two** `Transfer` logs: one from the ERC-20 interface `0x3600…0000` (value in 6 decimals) and one from the system emitter `0xfffffffffffffffffffffffffffffffffffffffe` (value in 18 decimals: 0.01 USDC logs as `0x2386f26fc10000` = 1e16). Counting both would double every amount and mix decimals.
+- Decision: the ledger reads **Memo events only** (they carry `memoId`, the call-data hash and our data). It never sums raw `Transfer` logs. The verify page matches a settle leg to its transfer by `callDataHash` and reads amounts from the 6-decimal `0x3600…0000` log only.
+
+### D4. Settlement shape: each debtor signs their own batch
+- D2 shows one signature moves value only from the signer. A single signature therefore cannot pay the whole group.
+- Decision: netting produces the group-wide transfer list (N debts become at most N-1 transfers). Each debtor then signs one `aggregate3` batch holding **their own** legs. A debtor who owes several creditors still pays them all in one signature.
+- The demo script is cut around one debtor with 2+ legs. The settle screen shows the whole group plan and marks each leg as paid or open, rebuilt from Memo events.
