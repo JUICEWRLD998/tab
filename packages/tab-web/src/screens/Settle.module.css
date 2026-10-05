@@ -136,6 +136,7 @@
 }
 .tally .gap {
   color: var(--muted);
+  margin: 0 0.3em;
 }
 .line {
   color: var(--muted);

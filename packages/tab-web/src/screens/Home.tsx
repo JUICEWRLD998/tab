@@ -33,8 +33,8 @@ function OpenGroup() {
         <Field label="Group id" htmlFor={idId} error={err.id}>
           <input id={idId} className={inputClass} value={id} onChange={(e) => setId(e.target.value)} autoComplete="off" autoCapitalize="off" spellCheck={false} aria-invalid={!!err.id} aria-describedby={err.id ? `${idId}-err` : undefined} />
         </Field>
-        <Field label="Created in block" htmlFor={blockId} error={err.block} hint="Optional">
-          <input id={blockId} className={`${inputClass} num`} value={block} onChange={(e) => setBlock(e.target.value)} inputMode="numeric" autoComplete="off" aria-invalid={!!err.block} aria-describedby={err.block ? `${blockId}-err` : `${blockId}-hint`} />
+        <Field label="Created in block (optional)" htmlFor={blockId} error={err.block}>
+          <input id={blockId} className={`${inputClass} num`} value={block} onChange={(e) => setBlock(e.target.value)} inputMode="numeric" autoComplete="off" aria-invalid={!!err.block} aria-describedby={err.block ? `${blockId}-err` : undefined} />
         </Field>
       </div>
       <div>

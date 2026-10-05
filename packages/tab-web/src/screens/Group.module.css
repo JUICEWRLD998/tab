@@ -38,10 +38,17 @@
   gap: var(--s6);
   min-width: 0;
 }
-/* On a phone the settle card comes first: it is the thing to do. */
+/* On a phone the settle card comes first (it is the thing to do) and the expense form comes after the ledger it adds to. */
 @media (max-width: 1023px) {
+  .main,
   .aside {
-    order: -1;
+    display: contents;
+  }
+  .settleCard {
+    order: -2;
+  }
+  .form {
+    order: 9;
   }
 }
 

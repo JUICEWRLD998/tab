@@ -96,6 +96,7 @@ function AddExpense({ ledger, id, onLogged, me }: { ledger: Ledger; id: string; 
       setDone({ hash, block: blockNumber });
       setLabel("");
       setAmount("");
+      setPicked(new Set(ledger.members)); // each expense starts as an even split between everyone again
       onLogged(blockNumber, hash);
     } catch (e2) {
       setErr({ submit: walletMessage(e2) });

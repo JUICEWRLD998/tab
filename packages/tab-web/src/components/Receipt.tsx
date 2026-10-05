@@ -87,10 +87,10 @@ export function Receipt({
         </ul>
       )}
       {totalLabel && (
-        <div className={s.total}>
+        <m.div className={s.total} initial={false} animate={{ opacity: printed ? 1 : 0 }} transition={{ duration: dur.short, ease: ease.out, delay: printed ? 0.1 + lines.length * 0.11 : 0 }}>
           <span>{totalLabel}</span>
           <span>{totalValue}</span>
-        </div>
+        </m.div>
       )}
       {meta.length > 0 && (
         <dl className={s.meta}>

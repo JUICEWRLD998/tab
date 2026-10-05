@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { connect, disconnect, hasWallet, useWallet } from "../lib/wallet";
+import { connect, disconnect, useWallet } from "../lib/wallet";
 import { shortAddr } from "../lib/format";
 import { href, type Route } from "../lib/router";
 import { Button, Notice } from "./ui";
@@ -87,7 +87,7 @@ function WalletButton() {
     );
   }
   return (
-    <Button variant="secondary" onClick={() => void connect()} loading={w.status === "connecting"} disabled={!hasWallet() && w.status !== "error"} title={hasWallet() ? undefined : "No browser wallet found"}>
+    <Button variant="secondary" onClick={() => void connect()} loading={w.status === "connecting"}>
       Connect<span className={s.long}>&nbsp;wallet</span>
     </Button>
   );

@@ -192,7 +192,7 @@ function SettleView({ id, ledger, reload }: { id: string; ledger: Ledger; reload
           <span className={netted ? s.old : undefined}>{plural(view.debts.length, "debt")}</span>
           {netted && (
             <m.span className={s.new} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: dur.short, ease: ease.out }}>
-              <span className={s.gap}> → </span>
+              <span className={s.gap}>→</span>
               {plural(view.plan.length, "transfer")}
             </m.span>
           )}

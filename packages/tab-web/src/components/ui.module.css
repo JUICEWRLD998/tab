@@ -93,6 +93,7 @@
 .field {
   display: grid;
   gap: var(--s2);
+  align-content: start;
 }
 .label {
   font-size: var(--step--1);

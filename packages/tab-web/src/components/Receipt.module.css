@@ -11,6 +11,7 @@
   padding: calc(var(--s6) + 4px) var(--s5) calc(var(--s6) + 4px);
   filter: drop-shadow(var(--shadow-paper));
   isolation: isolate;
+  overflow: clip;
 }
 .onRaised {
   --notch: var(--raised);
@@ -130,7 +131,7 @@
 .stamp {
   position: absolute;
   right: var(--s4);
-  bottom: calc(var(--s8) + var(--s3));
+  bottom: calc(var(--s6) + 2px);
   padding: 4px 14px 3px;
   border: 3px solid var(--stamp);
   border-radius: 6px;

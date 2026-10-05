@@ -34,6 +34,7 @@
   --stamp: oklch(0.5 0.17 28);
 
   --focus: oklch(0.83 0.145 168);
+  --mark: var(--paper);
 
   /* type */
   --font-ui: "Familjen Grotesk Variable", "Familjen Grotesk", system-ui, sans-serif;
@@ -87,6 +88,7 @@
   --coral: oklch(0.5 0.16 24);
   --sky: oklch(0.46 0.11 240);
   --focus: oklch(0.5 0.1 168);
+  --mark: var(--paper-ink);
   --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.7) inset, 0 6px 20px oklch(0.4 0.04 248 / 0.14);
   --shadow-paper: 0 10px 24px oklch(0.4 0.04 248 / 0.22);
 }
@@ -108,6 +110,7 @@
     --coral: oklch(0.5 0.16 24);
     --sky: oklch(0.46 0.11 240);
     --focus: oklch(0.5 0.1 168);
+  --mark: var(--paper-ink);
     --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.7) inset, 0 6px 20px oklch(0.4 0.04 248 / 0.14);
   --shadow-paper: 0 10px 24px oklch(0.4 0.04 248 / 0.22);
   }

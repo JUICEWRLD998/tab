@@ -63,10 +63,11 @@ async function ensureArc(eth: Eip1193) {
   }
 }
 
-export async function connect(): Promise<void> {
+/** `silent` is for account or network changes made inside the wallet: keep showing the old session until the new one is ready, so forms do not flip to "Connect". */
+export async function connect(opts: { silent?: boolean } = {}): Promise<void> {
   const eth = window.ethereum;
   if (!eth) return set({ status: "error", message: "No browser wallet found. Install MetaMask, Rabby or Coinbase Wallet." });
-  set({ status: "connecting" });
+  if (!opts.silent) set({ status: "connecting" });
   try {
     const accounts = (await eth.request({ method: "eth_requestAccounts" })) as string[];
     const address = accounts[0]?.toLowerCase() as Address | undefined;
@@ -89,12 +90,11 @@ let wired = false;
 export function wireWalletEvents() {
   if (wired || !window.ethereum?.on) return;
   wired = true;
-  window.ethereum.on("accountsChanged", () => {
-    if (state.status === "connected") void connect();
-  });
-  window.ethereum.on("chainChanged", () => {
-    if (state.status === "connected") void connect();
-  });
+  const follow = () => {
+    if (state.status === "connected") void connect({ silent: true });
+  };
+  window.ethereum.on("accountsChanged", follow);
+  window.ethereum.on("chainChanged", follow);
 }
 
 export function useWallet(): WalletState {
