@@ -7,11 +7,11 @@ import { privateKeyToAccount } from "viem/accounts";
 const RPC = "https://rpc.mainnet.arc.io";
 const arc = defineChain({ id: 5042, name: "Arc", nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 }, rpcUrls: { default: { http: [RPC] } } });
 
-const MOCK = `(() => {
+const INJECTED = `(() => {
   let n = 0; const pending = new Map(); const listeners = {};
   window.__walletResolve = (id, r) => { const p = pending.get(id); pending.delete(id); if (!p) return; r.ok ? p.res(r.result) : p.rej(Object.assign(new Error(r.message), { code: r.code })); };
   window.ethereum = {
-    isMock: true,
+    isTestProvider: true,
     request: ({ method, params }) => new Promise((res, rej) => { const id = ++n; pending.set(id, { res, rej }); window.__walletBridge(JSON.stringify({ id, method, params })); }),
     on: (e, cb) => { (listeners[e] ||= []).push(cb); },
     removeListener: () => {},
@@ -28,8 +28,8 @@ export async function installWallet(cdp, keys, dir = process.env.TAB_WALLET_DIR)
   const state = { current: Object.keys(accounts)[0], reject: 0, sent: [], requests: [] };
 
   await cdp.send("Runtime.addBinding", { name: "__walletBridge" });
-  await cdp.send("Page.addScriptToEvaluateOnNewDocument", { source: MOCK });
-  await cdp.eval(MOCK); // also install into the page that is already open
+  await cdp.send("Page.addScriptToEvaluateOnNewDocument", { source: INJECTED });
+  await cdp.eval(INJECTED); // also install into the page that is already open
 
   async function handle(method, params) {
     const acct = accounts[state.current];

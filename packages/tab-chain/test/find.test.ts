@@ -3,8 +3,8 @@ import { encodeAbiParameters, encodeEventTopics, type Hex, type PublicClient } f
 import { encodeExpenseMemo, encodeGroupMemo, groupMemoId, memoAbi, USDC_ADDRESS } from "@tab/core";
 import { findLedger } from "../src/read";
 
-const A = "0x00000000000000000000000000000000000000a1" as const;
-const B = "0x00000000000000000000000000000000000000b2" as const;
+const A = "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1" as const;
+const B = "0xb2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2" as const;
 const memoId = groupMemoId("find");
 
 function log(blockNumber: bigint, memoData: Hex, sender: Hex = A) {
@@ -13,8 +13,8 @@ function log(blockNumber: bigint, memoData: Hex, sender: Hex = A) {
   return { blockNumber, logIndex: 0, transactionHash: ("0x" + blockNumber.toString(16).padStart(64, "0")) as Hex, topics, data };
 }
 
-/** A fake chain: only getBlockNumber and getLogs, which is all the reader uses. Counts the ranges it was asked for. */
-function fakeClient(head: bigint, logs: ReturnType<typeof log>[]) {
+/** A scripted chain: only getBlockNumber and getLogs, which is all the reader uses. Counts the ranges it was asked for. */
+function scriptedClient(head: bigint, logs: ReturnType<typeof log>[]) {
   const ranges: [bigint, bigint][] = [];
   const client = {
     getBlockNumber: async () => head,
@@ -31,7 +31,7 @@ describe("findLedger", () => {
   const spend = (b: bigint) => log(b, encodeExpenseMemo({ payer: A, amount: 10n, participants: [A, B], label: "x" }));
 
   it("planted control: a group created 130k blocks back is found by walking back, with the later expense merged in", async () => {
-    const { client, ranges } = fakeClient(300_000n, [create(170_000n), spend(250_000n)]);
+    const { client, ranges } = scriptedClient(300_000n, [create(170_000n), spend(250_000n)]);
     const r = await findLedger(client, memoId, { anchor: 300_000n });
     expect(r.ledger).not.toBeNull();
     expect(r.ledger!.name).toBe("Trip");
@@ -40,19 +40,19 @@ describe("findLedger", () => {
     expect(ranges.length).toBeGreaterThan(8);
   });
   it("stops at the cap and reports no group instead of scanning forever", async () => {
-    const { client } = fakeClient(1_000_000n, [create(10n)]);
+    const { client } = scriptedClient(1_000_000n, [create(10n)]);
     const r = await findLedger(client, memoId, { anchor: 1_000_000n, lookback: 120_000n });
     expect(r.ledger).toBeNull();
     expect(1_000_000n - r.scannedFrom).toBeLessThanOrEqual(160_000n);
   });
   it("a known fromBlock scans once and never walks back", async () => {
-    const { client, ranges } = fakeClient(300_000n, []);
+    const { client, ranges } = scriptedClient(300_000n, []);
     const r = await findLedger(client, memoId, { anchor: 300_000n, fromBlock: 299_000n });
     expect(r.ledger).toBeNull();
     expect(ranges).toEqual([[299_000n, 300_000n]]);
   });
   it("near genesis the walk stops at block 0", async () => {
-    const { client } = fakeClient(50_000n, []);
+    const { client } = scriptedClient(50_000n, []);
     const r = await findLedger(client, memoId, { anchor: 50_000n });
     expect(r.scannedFrom).toBe(0n);
   });

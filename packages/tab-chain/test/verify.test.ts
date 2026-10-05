@@ -4,9 +4,9 @@ import { encodeSettleMemo, groupMemoId, memoAbi, MEMO_ADDRESS, settleCallDataHas
 import type { PublicClient } from "viem";
 import { analyzeLogs, checkLegs, NotTabTxError, verifyTx } from "../src/verify";
 
-const A = "0x00000000000000000000000000000000000000a1" as const;
-const B = "0x00000000000000000000000000000000000000b2" as const;
-const C = "0x00000000000000000000000000000000000000c3" as const;
+const A = "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1" as const;
+const B = "0xb2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2b2" as const;
+const C = "0xc3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3c3" as const;
 const transferAbi = parseAbi(["event Transfer(address indexed from, address indexed to, uint256 value)"]);
 
 function memoLog(sender: Hex, memoData: Hex, callDataHash: Hex, index: number) {
@@ -46,7 +46,7 @@ describe("verify: receipt analysis", () => {
   });
   it("ignores memos from other contracts", () => {
     const l = leg(A, B, 5n, 0);
-    expect(analyzeLogs([{ ...l, address: "0x0000000000000000000000000000000000001234" }]).memos).toHaveLength(0);
+    expect(analyzeLogs([{ ...l, address: "0x1234123412341234123412341234123412341234" }]).memos).toHaveLength(0);
   });
 });
 

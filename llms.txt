@@ -1,0 +1,29 @@
+# Tab
+
+> Tab is a serverless group expense ledger on Arc mainnet (chain id 5042). Expenses are `Memo` events. Settlement is one netted `Multicall3From.aggregate3` batch per debtor, with a memo per leg. No backend, no database, no custody contract.
+
+Repository: https://github.com/JUICEWRLD998/tab
+License: MIT
+Author: Mustapha Fadhlullah (GitHub: JUICEWRLD998)
+
+## What to read first
+- README.md: what it is, what it uses Arc for, proof transactions, how to check them, known limits.
+- CLAIMS.md: every public claim mapped to a command or a mainnet transaction.
+- DECISIONS.md: dated design decisions, each settled by a transaction or a command.
+
+## Check it without a wallet (Node 22+)
+- `npm install`
+- `npm run verify -- 0xf0a3c947b36eaf6a8c09a064454cded790c37a141fccb50821553cbfb34463a4` rebuilds a real 3-leg settlement from its hash and exits 0 when verified.
+- `npm run group -- tab-1h4j301v 24357102` reads an open demo group from the chain.
+- `npm test` runs 98 tests with no network.
+
+## Arc features used
+- Memo predeploy 0x5294E9927c3306DcBaDb03fe70b92e01cCede505
+- Multicall3From predeploy 0x522fAf9A91c41c443c66765030741e4AaCe147D0
+- Native USDC, 6-decimal ERC-20 interface 0x3600000000000000000000000000000000000000
+- 20 gwei fee floor, USDC blocklist pre-check, deterministic finality, EOA-only callers
+
+## Code map
+- packages/tab-core: money, equal and custom split, netting (at most N-1 transfers), memo codec, ledger trust rules
+- packages/tab-chain: log reader, write path, settle batch, preflight, verifyTx
+- packages/tab-web: Vite + React static app and the browser drive scripts
