@@ -1,4 +1,4 @@
-import { formatUsdc } from "@tab/core";
+import { formatUsdc } from "@tab/core/money";
 
 export const shortAddr = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 export const shortHash = (h: string) => `${h.slice(0, 8)}…${h.slice(-6)}`;

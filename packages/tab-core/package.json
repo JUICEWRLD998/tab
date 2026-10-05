@@ -9,5 +9,9 @@
   },
   "dependencies": {
     "viem": "^2.21.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./money": "./src/money.ts"
   }
 }

@@ -10,5 +10,9 @@
   "dependencies": {
     "@tab/core": "*",
     "viem": "^2.21.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./explorer": "./src/explorer.ts"
   }
 }

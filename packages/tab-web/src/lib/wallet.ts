@@ -1,8 +1,6 @@
-import { arcMainnet, assertEoa } from "@tab/chain";
 import type { Address } from "@tab/core";
 import { useSyncExternalStore } from "react";
-import { createWalletClient, custom, type WalletClient } from "viem";
-import { pub } from "./chain";
+import type { WalletClient } from "viem";
 
 interface Eip1193 {
   request(args: { method: string; params?: unknown[] | object }): Promise<unknown>;
@@ -29,7 +27,8 @@ const set = (s: WalletState) => {
 
 export const hasWallet = () => typeof window !== "undefined" && !!window.ethereum;
 
-const CHAIN_HEX = "0x" + arcMainnet.id.toString(16);
+/** Arc mainnet, chain id 5042. viem and @tab/chain load on first connect, so the landing page ships without them. */
+const CHAIN_HEX = "0x13b2";
 
 /** Plain words for the errors a person can actually hit. */
 export function walletMessage(e: unknown): string {
@@ -41,7 +40,7 @@ export function walletMessage(e: unknown): string {
   return err?.shortMessage ?? err?.message ?? "Something went wrong.";
 }
 
-async function ensureArc(eth: Eip1193) {
+async function ensureArc(eth: Eip1193, arcMainnet: (typeof import("@tab/chain"))["arcMainnet"]) {
   const current = (await eth.request({ method: "eth_chainId" })) as string;
   if (current.toLowerCase() === CHAIN_HEX) return;
   try {
@@ -69,10 +68,11 @@ export async function connect(opts: { silent?: boolean } = {}): Promise<void> {
   if (!eth) return set({ status: "error", message: "No browser wallet found. Install MetaMask, Rabby or Coinbase Wallet." });
   if (!opts.silent) set({ status: "connecting" });
   try {
+    const [{ arcMainnet, assertEoa }, { createWalletClient, custom }, { pub }] = await Promise.all([import("@tab/chain"), import("viem"), import("./chain")]);
     const accounts = (await eth.request({ method: "eth_requestAccounts" })) as string[];
     const address = accounts[0]?.toLowerCase() as Address | undefined;
     if (!address) throw new Error("The wallet returned no account.");
-    await ensureArc(eth);
+    await ensureArc(eth, arcMainnet);
     await assertEoa(pub, address);
     const client = createWalletClient({ account: address, chain: arcMainnet, transport: custom(eth) });
     set({ status: "connected", address, client });
