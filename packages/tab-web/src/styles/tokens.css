@@ -68,6 +68,7 @@
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 8px 24px oklch(0.05 0.02 248 / 0.45);
+  --shadow-paper: 0 14px 30px oklch(0.05 0.02 248 / 0.55);
 }
 
 :root[data-theme="light"] {
@@ -87,6 +88,7 @@
   --sky: oklch(0.46 0.11 240);
   --focus: oklch(0.5 0.1 168);
   --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.7) inset, 0 6px 20px oklch(0.4 0.04 248 / 0.14);
+  --shadow-paper: 0 10px 24px oklch(0.4 0.04 248 / 0.22);
 }
 
 @media (prefers-color-scheme: light) {
@@ -107,5 +109,6 @@
     --sky: oklch(0.46 0.11 240);
     --focus: oklch(0.5 0.1 168);
     --shadow-raised: 0 1px 0 oklch(1 0 0 / 0.7) inset, 0 6px 20px oklch(0.4 0.04 248 / 0.14);
+  --shadow-paper: 0 10px 24px oklch(0.4 0.04 248 / 0.22);
   }
 }

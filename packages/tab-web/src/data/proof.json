@@ -1,0 +1,28 @@
+{
+  "hash": "0x42a23d78ca8e4ee7a16975b27d5c18ab303edb67359412aadc5f5b184936eec8",
+  "blockNumber": "24350357",
+  "signer": "0xe874c32569a28b2d0bca07ef25f0ec0b68beedd0",
+  "memoId": "0xc681e6c8b4225da1f9f4e443614d398edc57ef7bb97605e66e00cb9ea1046f54",
+  "groupName": "Settle",
+  "members": 4,
+  "expenses": 3,
+  "createdBlock": "24350329",
+  "legs": [
+    {
+      "from": "0xe874c32569a28b2d0bca07ef25f0ec0b68beedd0",
+      "to": "0xc541c196f38f2a92e87e3835df2a8f68ccdb4d0e",
+      "amount": "75000"
+    },
+    {
+      "from": "0xe874c32569a28b2d0bca07ef25f0ec0b68beedd0",
+      "to": "0xccd52402529766a428597fd02882c832ea3be658",
+      "amount": "75000"
+    },
+    {
+      "from": "0xe874c32569a28b2d0bca07ef25f0ec0b68beedd0",
+      "to": "0xe3fc4fd77562598382d0581f0ff27cc850122f2c",
+      "amount": "75000"
+    }
+  ],
+  "capturedAt": "2026-10-05T07:18:25.247Z"
+}

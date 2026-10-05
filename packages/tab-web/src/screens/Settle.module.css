@@ -1,0 +1,165 @@
+.head {
+  display: grid;
+  gap: var(--s2);
+  margin-bottom: var(--s6);
+}
+.back {
+  color: var(--muted);
+  font-size: var(--step--1);
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+}
+.title {
+  font-size: var(--step-2);
+}
+
+.stage {
+  display: grid;
+  gap: var(--s5);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr) 3.25rem minmax(0, 25rem);
+    gap: var(--s4);
+  }
+}
+
+.before {
+  display: grid;
+  gap: var(--s3);
+}
+.beforeHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s3);
+}
+.beforeHead h2 {
+  font-size: var(--step-1);
+}
+.count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--amber);
+}
+.debts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.debt {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s3) 0;
+  border-bottom: 1px dashed var(--line);
+  overflow-wrap: anywhere;
+}
+.debt:last-child {
+  border-bottom: 0;
+}
+.debt .amt {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--amber);
+}
+/* the strike draws left to right, staggered by --i */
+.debt::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 180ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 40ms);
+}
+.struck::after {
+  transform: scaleX(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .debt::after {
+    transition: none;
+  }
+}
+
+.arrow {
+  display: none;
+}
+@media (min-width: 900px) {
+  .arrow {
+    display: grid;
+    place-items: center;
+    align-self: center;
+    color: var(--muted);
+  }
+  .arrow svg {
+    width: 100%;
+    height: 24px;
+  }
+}
+
+.after {
+  width: 100%;
+  max-width: 25rem;
+  justify-self: center;
+}
+
+.bar {
+  margin-top: var(--s6);
+  display: grid;
+  gap: var(--s4);
+  max-width: 44rem;
+}
+.tally {
+  font-size: var(--step-2);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.tally .old {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--amber);
+  text-decoration-thickness: 2px;
+}
+.tally .new {
+  display: inline-block;
+}
+.tally .gap {
+  color: var(--muted);
+}
+.line {
+  color: var(--muted);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  align-items: center;
+}
+.done {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+}
+.square {
+  max-width: 560px;
+  display: grid;
+  gap: var(--s4);
+  justify-items: start;
+}
+.square h2 {
+  font-size: var(--step-2);
+}
+.square p {
+  color: var(--muted);
+}

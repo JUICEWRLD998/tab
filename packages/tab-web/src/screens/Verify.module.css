@@ -1,0 +1,204 @@
+.wrap {
+  display: grid;
+  gap: var(--s6);
+}
+.head {
+  display: grid;
+  gap: var(--s3);
+  max-width: 44rem;
+}
+.title {
+  font-size: var(--step-2);
+}
+.lede {
+  color: var(--muted);
+}
+.form {
+  display: grid;
+  gap: var(--s3);
+  max-width: 44rem;
+}
+@media (min-width: 560px) {
+  .formRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--s3);
+    align-items: start;
+  }
+}
+.formRow > button {
+  margin-top: 1.55rem;
+}
+@media (max-width: 559px) {
+  .formRow > button {
+    margin-top: var(--s3);
+    width: 100%;
+  }
+}
+
+.verdict {
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s5);
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--tone);
+  border-radius: var(--radius);
+}
+.verdict h2 {
+  font-size: var(--step-2);
+  color: var(--tone);
+}
+.verdict p {
+  color: var(--ink);
+}
+.ok {
+  --tone: var(--accent);
+}
+.bad {
+  --tone: var(--coral);
+}
+.warn {
+  --tone: var(--amber);
+}
+
+.cols {
+  display: grid;
+  gap: var(--s6);
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr) 24rem;
+    gap: var(--s7);
+  }
+  .side {
+    position: sticky;
+    top: var(--s5);
+  }
+}
+.evidence {
+  display: grid;
+  gap: var(--s5);
+  min-width: 0;
+}
+.evidence h3 {
+  font-size: var(--step-1);
+}
+.leg {
+  display: grid;
+  gap: var(--s3);
+  padding: var(--s4);
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.legTitle {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.legTitle span:last-child {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+}
+.check {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  gap: var(--s2);
+  font-size: var(--step--1);
+}
+.pass .glyph {
+  color: var(--accent);
+}
+.fail .glyph {
+  color: var(--coral);
+}
+.glyph {
+  font-weight: 700;
+}
+.facts {
+  margin: 0;
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s4);
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+.facts dt {
+  color: var(--muted);
+}
+.facts dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.code {
+  margin: 0;
+  padding: var(--s4);
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--step--1);
+  overflow-x: auto;
+  white-space: pre;
+}
+.side {
+  display: grid;
+  gap: var(--s4);
+  max-width: 24rem;
+  width: 100%;
+  justify-self: center;
+}
+.skeleton {
+  display: grid;
+  gap: var(--s4);
+}
+.skBlock {
+  min-height: 9rem;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+.progress {
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.rescan {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  align-items: end;
+}
+.rescanField {
+  width: 12rem;
+}
+.memoRow {
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s3) 0;
+  border-bottom: 1px dashed var(--line);
+}
+.memoRow:last-child {
+  border-bottom: 0;
+}

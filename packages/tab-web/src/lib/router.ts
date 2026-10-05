@@ -3,6 +3,7 @@ import { useSyncExternalStore } from "react";
 /** Hash routes, so the app is a static file with no server rewrite rules. A group link carries its creation block (?from=) so a reader scans one range, not the whole chain. */
 export type Route =
   | { name: "home" }
+  | { name: "new" }
   | { name: "group"; id: string; from?: bigint }
   | { name: "settle"; id: string; from?: bigint }
   | { name: "verify"; hash?: string; from?: bigint }
@@ -19,6 +20,7 @@ export function parseRoute(hash: string): Route {
   const q = new URLSearchParams(query);
   const parts = path.split("/").filter(Boolean);
   if (parts.length === 0) return { name: "home" };
+  if (parts[0] === "new" && parts.length === 1) return { name: "new" };
   if (parts[0] === "g" && parts[1]) {
     let id: string;
     try {
@@ -36,6 +38,7 @@ export function parseRoute(hash: string): Route {
 const suffix = (from?: bigint) => (from !== undefined ? `?from=${from}` : "");
 export const href = {
   home: () => "#/",
+  new: () => "#/new",
   group: (id: string, from?: bigint) => `#/g/${encodeURIComponent(id)}${suffix(from)}`,
   settle: (id: string, from?: bigint) => `#/g/${encodeURIComponent(id)}/settle${suffix(from)}`,
   verify: (hash?: string, from?: bigint) => `#/v${hash ? "/" + hash : ""}${suffix(from)}`,

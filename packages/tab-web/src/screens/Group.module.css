@@ -1,0 +1,252 @@
+.head {
+  display: grid;
+  gap: var(--s3);
+  margin-bottom: var(--s6);
+}
+.title {
+  font-size: var(--step-2);
+  overflow-wrap: anywhere;
+}
+.facts {
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.headActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+
+.cols {
+  display: grid;
+  gap: var(--s6);
+  align-items: start;
+}
+@media (min-width: 1024px) {
+  .cols {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+    gap: var(--s7);
+  }
+  .aside {
+    position: sticky;
+    top: var(--s5);
+  }
+}
+.main,
+.aside {
+  display: grid;
+  gap: var(--s6);
+  min-width: 0;
+}
+/* On a phone the settle card comes first: it is the thing to do. */
+@media (max-width: 1023px) {
+  .aside {
+    order: -1;
+  }
+}
+
+.section {
+  display: grid;
+  gap: var(--s3);
+}
+.section h2 {
+  font-size: var(--step-1);
+}
+
+/* balances */
+.balances {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.member {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s1) var(--s4);
+  padding: var(--s3) 0;
+  border-bottom: 1px solid var(--line);
+}
+.member:last-child {
+  border-bottom: 0;
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.amt {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.owed {
+  --tone: var(--sky);
+}
+.owes {
+  --tone: var(--amber);
+}
+.square {
+  --tone: var(--muted);
+}
+.amt,
+.state {
+  color: var(--tone);
+}
+.state {
+  font-size: var(--step--1);
+  text-align: right;
+}
+.track {
+  grid-column: 1 / -1;
+  height: 4px;
+  background: var(--sunken);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  background: var(--tone);
+  transform-origin: left center;
+  border-radius: 2px;
+}
+
+/* ledger of expenses */
+.ledger {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.entry {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px var(--s4);
+  padding: var(--s3) 0;
+  border-bottom: 1px dashed var(--line);
+}
+.entry:last-child {
+  border-bottom: 0;
+}
+.label {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.sub {
+  grid-column: 1;
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+.money {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  display: grid;
+  gap: var(--s3);
+  justify-items: start;
+  color: var(--muted);
+}
+.empty svg {
+  width: 72px;
+  height: auto;
+  color: var(--paper);
+  opacity: 0.9;
+}
+
+/* settle card */
+.settleCard {
+  display: grid;
+  gap: var(--s4);
+}
+.big {
+  font-size: var(--step-2);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.big span {
+  color: var(--muted);
+}
+.mutedText {
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+
+/* add expense */
+.form {
+  display: grid;
+  gap: var(--s4);
+}
+.checks {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s1);
+}
+.checks legend {
+  padding: 0;
+  margin-bottom: var(--s2);
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--muted);
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  min-height: var(--target);
+  padding: 0 var(--s3);
+  border-radius: 10px;
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .check:hover {
+    background: var(--hover);
+  }
+}
+.check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+  flex: none;
+}
+
+.settled {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+}
+.settledRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s2) var(--s4);
+  padding: var(--s2) 0;
+  border-bottom: 1px dashed var(--line);
+}
+.settledRow:last-child {
+  border-bottom: 0;
+}
+
+.ignored summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: var(--step--1);
+  min-height: 28px;
+}
+.ignored ul {
+  margin: var(--s2) 0 0;
+  padding-left: var(--s5);
+  color: var(--muted);
+  font-size: var(--step--1);
+}
