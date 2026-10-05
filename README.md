@@ -5,6 +5,6 @@ Log what the group spent, then settle everyone with one signature.
 Tab is a serverless group expense ledger on Arc mainnet. Each expense is a `Memo` event.
 Settlement is one netted `Multicall3From` batch. No server, no account system, no custody contract.
 
-Status: **NOT LIVE** (Phase 0 in progress).
+Status: core, chain layer and mainnet settle are **LIVE**. Verify page and web app are **NOT LIVE** yet. See CLAIMS.md.
 
 Mustapha Fadhlullah — independent security researcher
