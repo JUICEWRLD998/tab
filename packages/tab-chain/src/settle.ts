@@ -74,12 +74,19 @@ export async function preflightSettle(pub: PublicClient, signer: Address, groupI
   return { legs, blocked, gas, feeUsdc, ok: true };
 }
 
+/** One plain sentence for a failed preflight. Used by settle() so the library never says "blocklisted" about a balance problem. */
+export function preflightMessage(pf: Preflight): string {
+  if (pf.blocked.length) return `blocklisted address in batch: ${pf.blocked.join(", ")}. Pay that leg manually.`;
+  if (pf.short) return `the signer holds ${pf.short.balance} base units of USDC but the batch needs ${pf.short.needed} including the fee.`;
+  return "the settle batch failed its preflight.";
+}
+
 export async function settle(pub: PublicClient, wallet: WalletClient, groupId: string, legs: Transfer[]): Promise<{ hash: Hex; blockNumber: bigint }> {
   const account = wallet.account!;
   const self = normalize(account.address);
   if (legs.some((l) => l.from !== self)) throw new Error("a wallet can only sign legs it owes (msg.sender is preserved)");
   const pf = await preflightSettle(pub, self, groupId, legs);
-  if (!pf.ok) throw new Error(`blocklisted address in batch: ${pf.blocked.join(", ")}. Pay that leg manually.`);
+  if (!pf.ok) throw new Error(preflightMessage(pf));
   const tx = buildSettleBatch(groupId, legs);
   const fees = await feeOverrides(pub);
   const hash = await wallet.sendTransaction({ account, chain: wallet.chain, to: tx.to, data: tx.data, gas: (pf.gas * 12n) / 10n, ...fees });

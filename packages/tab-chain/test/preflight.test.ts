@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PublicClient } from "viem";
-import { preflightSettle } from "../src/settle";
+import { preflightMessage, preflightSettle, settle } from "../src/settle";
 
 const A = "0x00000000000000000000000000000000000000a1" as const;
 const B = "0x00000000000000000000000000000000000000b2" as const;
@@ -56,5 +56,31 @@ describe("preflightSettle", () => {
     expect(p.ok).toBe(false);
     expect(p.blocked).toEqual([C]);
     expect(calls).not.toContain("balanceOf");
+  });
+});
+
+describe("settle() refuses before it can send", () => {
+  const wallet = (sent: string[]) =>
+    ({ account: { address: A }, chain: undefined, sendTransaction: async () => { sent.push("sent"); return "0x" + "1".repeat(64); } }) as never;
+  it("planted control: a balance problem is described as a balance problem, not a blocklist", async () => {
+    const { client } = fake({ balance: 200_000n });
+    const sent: string[] = [];
+    await expect(settle(client, wallet(sent), "g", legs)).rejects.toThrow(/holds 200000 base units.*needs 220000/);
+    expect(sent).toEqual([]);
+  });
+  it("a blocklisted recipient is named and nothing is sent", async () => {
+    const { client } = fake({ balance: 1_000_000n, blocked: [B] });
+    const sent: string[] = [];
+    await expect(settle(client, wallet(sent), "g", legs)).rejects.toThrow(/blocklisted address in batch: 0x0+b2/);
+    expect(sent).toEqual([]);
+  });
+  it("legs owed by someone else are refused before any network call", async () => {
+    const { client, calls } = fake({ balance: 1_000_000n });
+    await expect(settle(client, wallet([]), "g", [{ from: B, to: C, amount: 1n }])).rejects.toThrow(/only sign legs it owes/);
+    expect(calls).toEqual([]);
+  });
+  it("preflightMessage covers every failure shape", () => {
+    expect(preflightMessage({ legs, blocked: [C], gas: 0n, feeUsdc: 0n, ok: false })).toMatch(/blocklisted/);
+    expect(preflightMessage({ legs, blocked: [], short: { balance: 1n, needed: 2n }, gas: 0n, feeUsdc: 0n, ok: false })).toMatch(/needs 2/);
   });
 });
