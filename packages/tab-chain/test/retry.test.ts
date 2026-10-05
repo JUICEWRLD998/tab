@@ -17,6 +17,11 @@ describe("withRetry", () => {
     expect(isRetryable(new Error("x", { cause: Object.assign(new Error("y"), { code: -32014 }) }))).toBe(true);
     expect(isRetryable(new Error("RPC returned -32014 block not found"))).toBe(true);
   });
+  it("retries a rate limit (-32005)", async () => {
+    let n = 0;
+    expect(await withRetry(async () => { if (++n < 3) throw Object.assign(new Error("rate limit exceeded"), { code: -32005 }); return "ok"; }, { sleep: noSleep })).toBe("ok");
+    expect(isRetryable(new Error("Details: rate limit exceeded"))).toBe(true);
+  });
   it("does not retry other errors (planted negative control)", async () => {
     let n = 0;
     await expect(withRetry(async () => { n++; throw new Error("execution reverted"); }, { sleep: noSleep })).rejects.toThrow("reverted");

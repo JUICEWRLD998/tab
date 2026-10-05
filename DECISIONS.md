@@ -46,3 +46,10 @@ Anyone can post a Memo under any `memoId`. `buildLedger` counts a memo only if: 
 - Re-reading the group with the ledger builder shows 3 settled legs, 0 rejected memos, and every balance at zero.
 - A second identical run exists: group `settle-1791183025943`, tx `0x048927dee734bb6386a16c0bc0c2db185ed6f841e32e3f386aff465d72723ccf`.
 - The wallet is square after each run only because the creditors are my own throwaway wallets. Real value moved between wallets I hold; nothing left them.
+
+### D8. Verify from a tx hash alone (Phase 4, 2026-10-05)
+- `memoId = keccak("tab:" + groupId)` is one-way, so a tx hash gives a memoId, not a group id. The verifier works on the memoId: `verifyTx` reads the receipt, decodes every `Memo` log, and rebuilds the group by scanning `getLogs` on that memoId.
+- Per settle leg it checks two things from the receipt itself: `callDataHash == keccak(USDC.transfer(to, amount))`, and that a 6-decimal USDC `Transfer(from, to, amount)` log exists in the same tx. One transfer log satisfies one leg only. The 18-decimal system emitter is ignored (D3).
+- The creation memo may be older than the tx. Scan starts 40,000 blocks back (about 6 hours at the measured ~0.5 s block time) and walks back in 40,000-block steps up to 400,000 if the group is still missing. A caller can pin a start block instead. A share link from the app carries the creation block, so it needs no walk.
+- RPC: 4 parallel `getLogs` chunks hit `-32005 rate limit exceeded` on mainnet. Parallelism is now 2 and `-32005` is retried with backoff.
+- Exit check (LIVE, read-only): `verifyTx` on the Phase 3 tx `0x42a23d78…eec8` returns 3 legs, all hash-matched and transfer-confirmed, 75000 base units each, one signer, 3 legs accepted by the rebuilt ledger, 0 rejected, all balances zero. Test: `packages/tab-chain/test/verify.live.test.ts`. Planted controls: no transfer, wrong hash, double-claimed transfer, 18-decimal twin, foreign emitter (`verify.test.ts`).

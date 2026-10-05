@@ -25,23 +25,33 @@ export async function waitForHead(client: PublicClient, minHead: bigint, opts: {
   }
 }
 
-export async function fetchMemoEntries(client: PublicClient, groupId: string, opts: ReadOptions): Promise<LedgerEntry[]> {
-  const memoId = groupMemoId(groupId);
+/** Chunks run a few at a time: a day of Arc is about 170k blocks, so a serial scan is slow in a browser. */
+const PARALLEL = 2;
+
+export async function fetchMemoEntriesById(client: PublicClient, memoId: Hex, opts: ReadOptions): Promise<LedgerEntry[]> {
   if (opts.minHead !== undefined) await waitForHead(client, opts.minHead);
   const head = opts.toBlock ?? (await withRetry(() => client.getBlockNumber()));
   const chunk = opts.chunk ?? LOG_CHUNK;
   if (opts.fromBlock > head) return [];
   const event = memoAbi.find((x) => x.type === "event" && x.name === "Memo")!;
+  const ranges: [bigint, bigint][] = [];
+  for (let from = opts.fromBlock; from <= head; from += chunk) ranges.push([from, from + chunk - 1n > head ? head : from + chunk - 1n]);
   const out: LedgerEntry[] = [];
-  for (let from = opts.fromBlock; from <= head; from += chunk) {
-    const to = from + chunk - 1n > head ? head : from + chunk - 1n;
-    const logs = await withRetry(() => client.getLogs({ address: MEMO_ADDRESS, event, args: { memoId }, fromBlock: from, toBlock: to }));
-    for (const l of logs) {
-      const d = decodeMemoLog({ topics: l.topics as Hex[], data: l.data });
-      out.push({ sender: d.sender, target: d.target, callDataHash: d.callDataHash, memoData: d.memoData, blockNumber: l.blockNumber, logIndex: l.logIndex, txHash: l.transactionHash });
-    }
+  for (let i = 0; i < ranges.length; i += PARALLEL) {
+    const batch = await Promise.all(
+      ranges.slice(i, i + PARALLEL).map(([from, to]) => withRetry(() => client.getLogs({ address: MEMO_ADDRESS, event, args: { memoId }, fromBlock: from, toBlock: to }))),
+    );
+    for (const logs of batch)
+      for (const l of logs) {
+        const d = decodeMemoLog({ topics: l.topics as Hex[], data: l.data });
+        out.push({ sender: d.sender, target: d.target, callDataHash: d.callDataHash, memoData: d.memoData, blockNumber: l.blockNumber, logIndex: l.logIndex, txHash: l.transactionHash });
+      }
   }
   return out;
+}
+
+export function fetchMemoEntries(client: PublicClient, groupId: string, opts: ReadOptions): Promise<LedgerEntry[]> {
+  return fetchMemoEntriesById(client, groupMemoId(groupId), opts);
 }
 
 export async function readLedger(client: PublicClient, groupId: string, opts: ReadOptions): Promise<Ledger | null> {
