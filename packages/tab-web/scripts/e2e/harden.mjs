@@ -73,10 +73,10 @@ try {
   const recent = (await head()) - 50;
   const sentAtStart = wallet.state.sent.length;
 
-  // 1. Dropped RPC. Control first: the demo group loads.
+  // 1. Dropped RPC. Control first: the Lisbon group loads.
   await open(`#/g/${DEMO.id}?from=${DEMO.from}`);
-  await cdp.waitFor(`document.querySelector('h1')?.innerText === 'Lisbon weekend'`, { timeout: 60000, label: "control: demo group loads" });
-  check("control: the demo group loads with the RPC up", true);
+  await cdp.waitFor(`document.querySelector('h1')?.innerText === 'Lisbon weekend'`, { timeout: 60000, label: "control: Lisbon group loads" });
+  check("control: the Lisbon group loads with the RPC up", true);
   mode = "fail";
   await open(`#/g/${DEMO.id}?from=${DEMO.from}`);
   await cdp.waitFor(`document.body.innerText.includes('Could not read the chain')`, { timeout: 90000, label: "error state when the RPC is down" });

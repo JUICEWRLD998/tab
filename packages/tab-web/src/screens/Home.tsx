@@ -87,7 +87,7 @@ export function Home() {
           <p className={s.lede}>Tab keeps a shared tab on Arc. Everyone logs what they paid, Tab nets the debts, and each person who owes signs once. No server, no account, nobody holding the money.</p>
           <div className={s.actions}>
             <LinkButton variant="primary" href={href.group(demo.id, demo.from)}>
-              Open the demo group
+              Open the Lisbon group
             </LinkButton>
             <LinkButton variant="secondary" href={href.new()}>
               Start a group

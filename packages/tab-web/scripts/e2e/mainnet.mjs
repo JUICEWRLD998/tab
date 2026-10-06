@@ -70,7 +70,7 @@ try {
 
   if (MODE === "demo" || MODE === "all") {
     results.demo = await buildGroup("Lisbon weekend");
-    log("DEMO GROUP", results.demo.id, results.demo.from);
+    log("LISBON GROUP", results.demo.id, results.demo.from);
   }
 
   if (MODE === "settle" || MODE === "all") {
