@@ -29,13 +29,13 @@ git clone https://github.com/JUICEWRLD998/tab.git && cd tab && npm install
 # 1. Rebuild a real settlement from its transaction hash alone and check every leg.
 npm run verify -- 0xf0a3c947b36eaf6a8c09a064454cded790c37a141fccb50821553cbfb34463a4
 
-# 2. Read the open demo group straight from the chain: 5 debts, netted to 3 transfers.
+# 2. Read the open Lisbon group straight from the chain: 5 debts, netted to 3 transfers.
 npm run group -- tab-1h4j301v 24357102
 ```
 
-The first command ends with `VERIFIED: 3 transfers, one signature.` and exits 0. It exits 1 for a transaction that does not verify, including a real `Memo` transaction that is not Tab's. The second prints the demo group's members, expenses and the netted plan.
+The first command ends with `VERIFIED: 3 transfers, one signature.` and exits 0. It exits 1 for a transaction that does not verify, including a real `Memo` transaction that is not Tab's. The second prints the Lisbon group's members, expenses and the netted plan.
 
-To see the interface, run `npm run build:web && npm run preview:web` and open http://localhost:4173. Open the demo group, then press "Preview the netting". That page works without a wallet. To check a payment, open the Verify page and paste the hash above.
+To see the interface, run `npm run build:web && npm run preview:web` and open http://localhost:4173. Open the Lisbon group, then press "Preview the netting". That page works without a wallet. To check a payment, open the Verify page and paste the hash above.
 
 ## What it uses Arc for
 
@@ -69,7 +69,7 @@ Expenses and group creation wrap a harmless `USDC.transfer(self, 0)` so the memo
 
 Reading is the reverse. The reader calls `getLogs` for the `Memo` topic and the group's `memoId`, in 5,000-block chunks, decodes each event, and applies the trust rules below in chain order. Balances come from folding expenses and settled legs. Netting is a greedy min-cash-flow match of the largest debtor to the largest creditor, which gives at most N-1 transfers for N people with a non-zero balance.
 
-Each debtor signs their own batch. One signature can only move value out of the signer's wallet (DECISIONS.md D2 and D4). So the group's netted plan is split by debtor, and a debtor who owes three people still pays all three in one signature. In the demo group a single wallet owes everything, so one signature settles the whole group.
+Each debtor signs their own batch. One signature can only move value out of the signer's wallet (DECISIONS.md D2 and D4). So the group's netted plan is split by debtor, and a debtor who owes three people still pays all three in one signature. In the Lisbon group a single wallet owes everything, so one signature settles the whole group.
 
 ### Trust rules
 
@@ -95,7 +95,7 @@ Each rule has a test that plays the attacker, in `packages/tab-core/test/ledger.
 | `msg.sender` survives `Multicall3From` and `Memo` to USDC | [`0x788a3abb…26e0`](https://explorer.arc.io/tx/0x788a3abbe97f603fdbd5d561d4d034e6022d6ae6a5e8c1ce7c9ed5d03c3f26e0) |
 | A 3-leg settlement, one signature, a memo per leg (library run) | [`0x42a23d78…eec8`](https://explorer.arc.io/tx/0x42a23d78ca8e4ee7a16975b27d5c18ab303edb67359412aadc5f5b184936eec8) |
 | The same settlement made through the web app by a browser wallet | [`0xf0a3c947…63a4`](https://explorer.arc.io/tx/0xf0a3c947b36eaf6a8c09a064454cded790c37a141fccb50821553cbfb34463a4) |
-| Demo group `tab-1h4j301v`, created at block 24357102, left unsettled on purpose | [`0xd6703391…cf00`](https://explorer.arc.io/tx/0xd6703391692086af59c5bf07b58234af3678ebcaefba737320293d232a5cbf00) |
+| Lisbon group `tab-1h4j301v`, created at block 24357102, left unsettled on purpose | [`0xd6703391…cf00`](https://explorer.arc.io/tx/0xd6703391692086af59c5bf07b58234af3678ebcaefba737320293d232a5cbf00) |
 
 You can check any of them without Tab. For the settlement made through the web app:
 
@@ -112,7 +112,7 @@ The wallets in these runs are throwaway keys generated for the build and funded 
 | | |
 |---|---|
 | ![Group page with balances and expenses](docs/img/group.png) | ![Settle page: five debts struck through, three transfers printed on a receipt](docs/img/settle-preview.png) |
-| The demo group read live from the chain. | "Preview the netting" with no wallet: 5 open debts become 3 transfers. |
+| The Lisbon group read live from the chain. | "Preview the netting" with no wallet: 5 open debts become 3 transfers. |
 | ![Verify page returning Verified: 3 transfers, one signature](docs/img/verify.png) | ![Verify page on a phone](docs/img/verify-mobile.png) |
 | The Verify page on the real settlement. | The same page at 390 px. |
 

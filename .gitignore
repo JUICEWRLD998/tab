@@ -7,3 +7,5 @@ dist/
 .wallet/
 coverage/
 .DS_Store
+
+demo/build/
